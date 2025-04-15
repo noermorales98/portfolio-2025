@@ -102,33 +102,33 @@ export const workData = [
         title: 'FactuSync',
         description: 'Web App',
         bgImage: '/factusync02.webp',
-        link: 'https://www.linkedin.com/feed/update/urn:li:activity:7116664835752222720/'
+        link: 'https://blog.noermorales.com/factusync-web-app/'
     },
     {
         title: 'Content Creator',
         description: 'Content & Social Media',
         bgImage: '/instagramrui.webp',
-        link: 'https://www.instagram.com/rui_machalele_official/'
+        link: 'https://blog.noermorales.com/rui-machalele-technology-and-content-to-amplify-impact/'
     },
     {
         title: 'IA Automation',
         description: 'AI Tools',
         bgImage: '/iashot.webp',
-        link: 'https://lobosinversionistas.com/soporte-y-ayuda/'
+        link: 'https://blog.noermorales.com/lobos-inversionistas-an-educational-platform-with-integrated-artificial-intelligence/'
     },
     {
         title: 'Borage Catering',
         description: 'Web Design',
         bgImage: '/bc.webp',
-        link: 'https://boragecatering.com/'
+        link: 'https://blog.noermorales.com/website-design-for-borage-catering-style-elegance-and-functionality/'
     },
 ]
 
 export const serviceData = [
-    { icon: assets.iconweb, title: 'Web Design & Development', description: 'Modern, responsive websites with clean, user-focused interfaces using Wordress, React and Next.js.', link: '' },
-    { icon: assets.iconmedia, title: 'Content & Social Media', description: 'I manage your social profiles and create engaging videos, reels, and posts to grow your brand.', link: '' },
-    { icon: assets.iconai, title: 'AI Automation', description: 'Smart tools to automate replies on your website and social platforms.', link: '' },
-    { icon: assets.iconsupport, title: 'Technical Support', description: 'Personalized help to solve tech issues and keep your tools running.', link: '' },
+    { icon: assets.iconweb, title: 'Web Design & Development', description: 'Modern, responsive websites with clean, user-focused interfaces using Wordress, React and Next.js.', link: 'https://blog.noermorales.com/web-design-development/' },
+    { icon: assets.iconmedia, title: 'Content & Social Media', description: 'I manage your social profiles and create engaging videos, reels, and posts to grow your brand.', link: 'https://blog.noermorales.com/content-social-media/' },
+    { icon: assets.iconai, title: 'AI Automation', description: 'Smart tools to automate replies on your website and social platforms.', link: 'https://blog.noermorales.com/ai-automation/' },
+    { icon: assets.iconsupport, title: 'Technical Support', description: 'Personalized help to solve tech issues and keep your tools running.', link: 'https://blog.noermorales.com/technical-support/' },
 ]
 
 export const infoList = [
