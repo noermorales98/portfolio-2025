@@ -12,13 +12,13 @@ const ovo = Ovo({
 
 
 export const metadata = {
-  title: "Portfolio - Noeli Rodriguez",
-  description: "",
+  title: "Noeli Rodriguez | Portfolio",
+  description: "Portafolio de Noeli Rodriguez, desarrollador web y creador de contenido. Servicios de diseño web, contenido digital y automatización con IA.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="es-MX" className="scroll-smooth">
       <body
         className={`${outfit.className} ${ovo.className} antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
       >
