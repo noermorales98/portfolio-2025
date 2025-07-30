@@ -51,9 +51,9 @@ const Contact = () => {
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-        className="text-center text-5xl font-Ovo"
+        className="text-center text-5xl font-Ovo flex items-center justify-center gap-2 flex-wrap"
       >
-        ¡Hablemos sin compromiso!
+        <span>¡Hablemos sin compromiso!</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
       </motion.h2>
 
       <motion.p

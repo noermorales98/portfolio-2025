@@ -47,6 +47,7 @@ import iconmedia from "./icons3.svg";
 import iconai from "./icons2.svg";
 import iconsupport from "./icons4.svg";
 import computer_icon from "./computer.webp";
+import saludo_icon from "./saludo.webp";
 export const assets = {
   user_image,
   code_icon,
@@ -97,6 +98,7 @@ export const assets = {
   iconai,
   iconsupport,
   computer_icon,
+  saludo_icon,
 };
 
 export const workData = [

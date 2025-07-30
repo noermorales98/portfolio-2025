@@ -12,8 +12,8 @@ const ovo = Ovo({
 
 
 export const metadata = {
-  title: "Noeli Rodriguez | Portfolio",
-  description: "Portafolio de Noeli Rodriguez, desarrollador web y creador de contenido. Servicios de diseño web, contenido digital y automatización con IA.",
+  title: "Noeli Rodriguez | Servicios Digitales",
+  description: "Noeli Rodriguez, desarrollador web y creador de contenido. Servicios de diseño web, contenido digital y automatización con IA.",
 };
 
 export default function RootLayout({ children }) {
