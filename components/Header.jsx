@@ -24,7 +24,7 @@ const Header = () => {
     whileInView={{y: 0, opacity: 1}}
     transition={{duration: 0.8, delay: 0.5}}
     className='text-3xl sm:text-6xl lg:text-[66px] font-Ovo flex items-center justify-center gap-2 flex-wrap'>
-        <span>Desarrollador Web</span> <Image src={assets.computer_icon} alt='' className='w-10 sm:w-16'/> <span>& Creador de Contenido</span></motion.h1>
+        <span>Desarrollador Web</span> <Image src={assets.computer_icon} alt='' className='w-10 sm:w-16'/> <span>& Gestor de Contenido</span></motion.h1>
 
         <motion.p
         initial={{opacity: 0}}
@@ -57,3 +57,4 @@ const Header = () => {
 }
 
 export default Header
+
