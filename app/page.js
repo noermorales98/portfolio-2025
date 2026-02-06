@@ -1,12 +1,13 @@
 'use client'
 import { useEffect, useState } from "react";
 import About from "../components/About";
+import Work from "../components/Work";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
 import Services from "../components/Services";
-import Work from "../components/Work";
+import QuotationWizard from "../components/QuotationWizard";
 
 export default function Home() {
 
@@ -37,6 +38,7 @@ export default function Home() {
     <About isDarkMode={isDarkMode} />
     <Services isDarkMode={isDarkMode} />
     <Work isDarkMode={isDarkMode} />
+    <QuotationWizard />
     <Contact isDarkMode={isDarkMode} />
     <Footer isDarkMode={isDarkMode} />
     </>

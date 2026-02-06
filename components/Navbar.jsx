@@ -40,6 +40,7 @@ const Navbar = ({isDarkMode, setIsDarkMode}) => {
             <li><a className='font-Ovo' href="#about">Sobre mí</a></li>
             <li><a className='font-Ovo' href="#services">Servicios</a></li>
             <li><a className='font-Ovo' href="#work">Mi Trabajo</a></li>
+            <li><a className='font-Ovo' href="#cotizar">Cotizar</a></li>
             <li><a className='font-Ovo' href="#contact">Contáctame</a></li>
         </ul>
 
@@ -69,6 +70,7 @@ const Navbar = ({isDarkMode, setIsDarkMode}) => {
             <li><a className='font-Ovo' onClick={closeMenu} href="#about">Sobre mí</a></li>
             <li><a className='font-Ovo' onClick={closeMenu} href="#services">Servicios</a></li>
             <li><a className='font-Ovo' onClick={closeMenu} href="#work">Mi Trabajo</a></li>
+            <li><a className='font-Ovo' onClick={closeMenu} href="#cotizar">Cotizar</a></li>
             <li><a className='font-Ovo' onClick={closeMenu} href="#contact">Contáctame</a></li>
         </ul>
 
