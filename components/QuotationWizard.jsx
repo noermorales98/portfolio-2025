@@ -94,7 +94,7 @@ Me gustaría más información.`;
                 transition={{ delay: 0.3, duration: 0.5 }}
                 className="text-center mb-2 text-lg font-Ovo"
             >
-                Nuestros Servicios
+                Mis Servicios
             </motion.h4>
             <motion.h2
                 initial={{ y: -20, opacity: 0 }}
@@ -105,7 +105,7 @@ Me gustaría más información.`;
                 {step === 0 ? '¿Qué estás buscando?' : 'Personaliza tu plan'}
             </motion.h2>
 
-            <div className="max-w-4xl mx-auto bg-white dark:bg-[#2a2a2a] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-transparent rounded-xl shadow-lg dark:shadow-none p-8 border border-gray-100 dark:border-gray-700">
                 
                 {/* STEP 0: Category Selection */}
                 {step === 0 && (
@@ -149,7 +149,7 @@ Me gustaría más información.`;
                                         <h4 className="font-bold text-lg mb-2">{pkg.label}</h4>
                                         <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">{pkg.description}</p>
                                     </div>
-                                    <span className="inline-block px-4 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-semibold mt-2">
+                                    <span className="inline-block px-4 py-1 bg-gray-100 dark:bg-gray-800 dark:text-white rounded-full text-sm font-semibold mt-2">
                                         ${pkg.price} USD
                                     </span>
                                 </div>
@@ -171,7 +171,7 @@ Me gustaría más información.`;
                                 value={selections.note || ''}
                                 onChange={(e) => setSelections({ ...selections, note: e.target.value })}
                                 placeholder="Escribe aquí tus ideas, dudas o requerimientos especiales..."
-                                className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none resize-none bg-gray-50 dark:bg-gray-800 dark:text-white"
+                                className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none resize-none bg-gray-50 dark:bg-transparent dark:text-white"
                             ></textarea>
                          </div>
 
