@@ -1,8 +1,12 @@
-import * as hugeIcons from 'hugeicons-react';
+import * as HugeIcons from 'hugeicons-react';
 
-const keys = Object.keys(hugeIcons);
+const allExports = Object.keys(HugeIcons);
+console.log('Total exports:', allExports.length);
 
-console.log('Customer support icons:', keys.filter(k => k.toLowerCase().includes('customer') || k.toLowerCase().includes('support')));
-console.log('Invoice icons:', keys.filter(k => k.toLowerCase().includes('invoice')));
-console.log('Mail icons:', keys.filter(k => k.toLowerCase().includes('mail')));
-console.log('Cancel/Close icons:', keys.filter(k => k.toLowerCase().includes('cancel') || k.toLowerCase().includes('close') || k.toLowerCase().includes('remove')));
+const searchTerms = ['arrow', 'plus', 'delete', 'trash', 'download', 'print'];
+
+searchTerms.forEach(term => {
+  console.log(`\n--- Icons matching "${term}" ---`);
+  const matches = allExports.filter(name => name.toLowerCase().includes(term));
+  console.log(matches.join(', '));
+});

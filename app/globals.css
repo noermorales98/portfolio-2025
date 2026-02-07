@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-  font-family: Outfit;
+
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body,
+  html {
+    background: white;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Reset print styles */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  .print\:w-full {
+    width: 100% !important;
+  }
+
+  .print\:bg-white {
+    background-color: white !important;
+  }
+
+  .print\:text-black {
+    color: black !important;
+  }
+
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
 }

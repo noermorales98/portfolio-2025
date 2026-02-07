@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomerSupportIcon, Invoice03Icon, Mail01Icon, Cancel01Icon } from 'hugeicons-react';
 
 export default function FloatingHelpButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Don't show on the hidden quote generator page
+  if (pathname?.includes('hidden-quote')) {
+    return null;
+  }
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -37,7 +44,7 @@ export default function FloatingHelpButton() {
             >
               <span className="font-medium text-sm md:text-base text-gray-700 dark:text-gray-200">Contactar</span>
               <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
-                <Mail01Icon size={18} className="md:w-5 md:h-5" variant="bulk" />
+                <Invoice03Icon size={18} className="md:w-5 md:h-5" variant="bulk" />
               </div>
             </a>
           </motion.div>

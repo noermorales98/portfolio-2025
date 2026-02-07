@@ -1,4 +1,4 @@
-import { Outfit, Ovo} from "next/font/google";
+import { Outfit, Ovo, Inter } from "next/font/google";
 import "./globals.css";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 
@@ -8,6 +8,10 @@ const outfit = Outfit({
 
 const ovo = Ovo({
   subsets: ["latin"], weight: ["400"]
+});
+
+const inter = Inter({
+  subsets: ["latin"], weight: ["300", "400", "500", "600", "700"]
 });
 
 
@@ -48,7 +52,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es-MX" className="scroll-smooth">
       <body
-        className={`${outfit.className} ${ovo.className} antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
+        className={`${inter.className} ${outfit.className} ${ovo.className} antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
       >
         {children}
         <FloatingHelpButton />
