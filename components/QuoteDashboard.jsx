@@ -1,66 +1,146 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const SUGGESTIONS = [
-  { name: 'Diseño Web Básico', price: 300 },
-  { name: 'E-commerce Completo', price: 800 },
-  { name: 'Mantenimiento Mensual', price: 50 },
-  { name: 'Rediseño de Logo', price: 150 },
-  { name: 'Consultoría SEO', price: 200 },
-];
+export default function QuoteDashboard({ onLogout, initialData = {} }) {
+  // --- Sender / Branding State (defaults from props or generic) ---
+  const [senderName, setSenderName] = useState(initialData.senderName || 'Tu Nombre / Empresa');
+  const [senderRole, setSenderRole] = useState(initialData.senderRole || 'Servicios Profesionales de Diseño y Desarrollo Web');
+  const [senderEmail, setSenderEmail] = useState(initialData.senderEmail || 'contacto@ejemplo.com');
+  const [senderWebsite, setSenderWebsite] = useState(initialData.senderWebsite || 'www.tuejemplo.com');
+  
+  const [showSenderConfig, setShowSenderConfig] = useState(false);
+  const [showDesignConfig, setShowDesignConfig] = useState(false);
 
-export default function QuoteDashboard({ onLogout }) {
+  // Customization State
+  const [logoImage, setLogoImage] = useState(initialData.logoImage || null);
+  const [includeLogo, setIncludeLogo] = useState(!!initialData.logoImage);
+  const [signatureMode, setSignatureMode] = useState(initialData.signatureMode || 'none'); // 'image', 'text', 'none'
+  const [signatureImage, setSignatureImage] = useState(initialData.signatureImage || null);
+  const [signatureText, setSignatureText] = useState(initialData.signatureText || 'Firma Digital');
+  
+  // Colors
+  const DEFAULTS = {
+    headerBg: '#2C2C2C',
+    headerText: '#FFFFFF',
+    bodyBg: '#F9F9F7',
+    bodyText: '#1a1a1a',
+    highlightBg: '#2C2C2C',
+    highlightText: '#000000'
+  };
+
+  const THEMES = {
+    elegant: {
+      name: 'Elegante (Default)',
+      colors: { ...DEFAULTS }
+    },
+    formal: {
+      name: 'Formal (Blanco/Negro)',
+      colors: {
+        headerBg: '#FFFFFF',
+        headerText: '#000000',
+        bodyBg: '#FFFFFF',
+        bodyText: '#000000',
+        highlightBg: '#000000',
+        highlightText: '#FFFFFF'
+      }
+    },
+    bold: {
+      name: 'Bold (Oscuro)',
+      colors: {
+        headerBg: '#000000',
+        headerText: '#FFFFFF',
+        bodyBg: '#111111',
+        bodyText: '#FFFFFF',
+        highlightBg: '#FFFFFF',
+        highlightText: '#000000'
+      }
+    }
+  };
+
+  const applyTheme = (themeKey) => {
+    const theme = THEMES[themeKey];
+    if (!theme) return;
+    setHeaderBg(theme.colors.headerBg);
+    setHeaderText(theme.colors.headerText);
+    setBodyBg(theme.colors.bodyBg);
+    setBodyText(theme.colors.bodyText);
+    setHighlightBg(theme.colors.highlightBg);
+    setHighlightText(theme.colors.highlightText);
+  };
+
+  const [headerBg, setHeaderBg] = useState(initialData.headerBg || DEFAULTS.headerBg);
+  const [headerText, setHeaderText] = useState(initialData.headerText || DEFAULTS.headerText);
+  const [bodyBg, setBodyBg] = useState(initialData.bodyBg || DEFAULTS.bodyBg);
+  const [bodyText, setBodyText] = useState(initialData.bodyText || DEFAULTS.bodyText);
+  const [highlightBg, setHighlightBg] = useState(initialData.highlightBg || DEFAULTS.highlightBg);
+  const [highlightText, setHighlightText] = useState(initialData.highlightText || DEFAULTS.highlightText);
+
+  const resetColors = () => {
+    setHeaderBg(DEFAULTS.headerBg);
+    setHeaderText(DEFAULTS.headerText);
+    setBodyBg(DEFAULTS.bodyBg);
+    setBodyText(DEFAULTS.bodyText);
+    setHighlightBg(DEFAULTS.highlightBg);
+    setHighlightText(DEFAULTS.highlightText);
+  };
+
+  const hasCustomColors = headerBg !== DEFAULTS.headerBg || 
+                          headerText !== DEFAULTS.headerText || 
+                          bodyBg !== DEFAULTS.bodyBg || 
+                          bodyText !== DEFAULTS.bodyText || 
+                          highlightBg !== DEFAULTS.highlightBg || 
+                          highlightText !== DEFAULTS.highlightText;
+
+  // Payment Config State
+  const [paymentMethod, setPaymentMethod] = useState('bank'); // 'bank' or 'link'
+  const [paymentLink, setPaymentLink] = useState(initialData.paymentLink || 'https://paypal.me/usuario');
+  const [bankDetails, setBankDetails] = useState({
+    bank: initialData.bankName || 'Banco Ejemplo',
+    account: initialData.bankAccount || '1234 5678 9012',
+    clabe: initialData.bankClabe || '012345678901234567',
+    holder: initialData.bankHolder || 'Nombre del Titular'
+  });
+
   // Core Info
   const [clientName, setClientName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [packageName, setPackageName] = useState('');
-  const [quoteNumber, setQuoteNumber] = useState(Date.now().toString().slice(-6));
+  const [quoteNumber, setQuoteNumber] = useState('');
+
+  useEffect(() => {
+    setQuoteNumber(Date.now().toString().slice(-6));
+  }, []);
   
   // New Fields
   const [currency, setCurrency] = useState('MXN'); // 'USD' or 'MXN'
   const [clientAddress, setClientAddress] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [notes, setNotes] = useState('Esta es una cotización personalizada y está sujeta a cambios y acomodos si es que no está satisfecho con la propuesta inicial.');
+  const [notes, setNotes] = useState(initialData.defaultNotes || 'Condiciones del servicio, tiempos de entrega y detalles de pago.');
 
-  // Payment Method State
-  const [paymentMethod, setPaymentMethod] = useState('bank'); // 'bank' or 'link'
-  const [paymentLink, setPaymentLink] = useState('https://paypal.me/noermorales');
-  const [bankDetails, setBankDetails] = useState({
-    bank: 'BBVA',
-    account: '1234 5678 9012',
-    clabe: '012345678901234567',
-    holder: 'Noelí Rodríguez'
-  });
+  // --- Items & Totals State ---
+  const [items, setItems] = useState(initialData.items || [
+    { id: 1, name: 'Servicio Ejemplo', quantity: 1, price: 1000 }
+  ]);
+  const [includeIva, setIncludeIva] = useState(false);
+  const [ivaPercentage, setIvaPercentage] = useState(16);
+  const [ivaMode, setIvaMode] = useState('add'); // 'add' (sumar) or 'inclusive' (desglosar)
 
-  // Services State
-  const [items, setItems] = useState([{ id: 1, name: '', price: 0, quantity: 1 }]);
-
-  // Tax State
-  const [includeIva, setIncludeIva] = useState(true);
-  const [ivaMode, setIvaMode] = useState('add'); // 'add' (Más IVA) or 'inclusive' (Incluido/Desglosar)
-  const [ivaPercentage, setIvaPercentage] = useState(16); // Default 16%
-
+  // --- Helpers ---
   const addItem = () => {
-    setItems([...items, { id: Date.now(), name: '', price: 0, quantity: 1 }]);
+    setItems([...items, { id: Date.now(), name: '', quantity: 1, price: 0 }]);
   };
 
   const removeItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
+    setItems(items.filter(i => i.id !== id));
   };
 
   const updateItem = (id, field, value) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, [field]: (field === 'price' || field === 'quantity') ? Number(value) : value } : item
-    ));
+    setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
   };
 
-  const addSuggestion = (suggestion) => {
-    setItems([...items, { id: Date.now(), ...suggestion, quantity: 1 }]);
-  };
-
-  // Math Logic
+  // --- Calculations ---
   const rawSum = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const taxRateDecimal = ivaPercentage / 100;
   
@@ -69,7 +149,6 @@ export default function QuoteDashboard({ onLogout }) {
   let total = 0;
 
   if (!includeIva) {
-      // No Tax
       subtotal = rawSum;
       taxAmount = 0;
       total = rawSum;
@@ -89,6 +168,28 @@ export default function QuoteDashboard({ onLogout }) {
   }
 
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSignatureUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignatureImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -106,10 +207,11 @@ export default function QuoteDashboard({ onLogout }) {
     const content = `
 # Cotización #${quoteNumber}: ${packageName}
 
+**De:** ${senderName} (${senderEmail})
 **Para:** ${clientName}
 **Fecha:** ${getFormattedDate(date)}
-${clientEmail ? `**Email:** ${clientEmail}` : ''}
-${clientPhone ? `**Tel:** ${clientPhone}` : ''}
+${clientEmail ? `**Email Cliente:** ${clientEmail}` : ''}
+${clientPhone ? `**Tel Cliente:** ${clientPhone}` : ''}
 
 ---
 
@@ -134,7 +236,7 @@ CLABE: ${bankDetails.clabe}
 Titular: ${bankDetails.holder}
 ` : `Link: ${paymentLink}`}
 
-Generated by noermorales.com
+Generated by ${senderWebsite}
     `.trim();
 
     const blob = new Blob([content], { type: 'text/markdown' });
@@ -149,7 +251,7 @@ Generated by noermorales.com
   };
 
   return (
-    <div className="min-h-screen bg-white text-black p-8 print:bg-[#F9F9F7] print:text-black print:p-0 font-inter">
+    <div className="min-h-screen bg-white text-black p-8 print:bg-white print:text-black print:p-0 font-inter">
       <div className="max-w-6xl mx-auto">
         {/* Editor Header - Hidden in Print */}
         <div className="flex justify-between items-center mb-6 print:hidden">
@@ -165,12 +267,14 @@ Generated by noermorales.com
               <option value="MXN">MXN ($)</option>
               <option value="USD">USD ($)</option>
             </select>
-            <button 
-              onClick={onLogout}
-              className="text-xs flex items-center gap-2 text-zinc-500 hover:text-black transition-colors"
-            >
-              Salir
-            </button>
+            {onLogout && (
+                <button 
+                onClick={onLogout}
+                className="text-xs flex items-center gap-2 text-zinc-500 hover:text-black transition-colors"
+                >
+                Salir
+                </button>
+            )}
           </div>
         </div>
 
@@ -178,6 +282,171 @@ Generated by noermorales.com
           {/* Editor Column - Hidden in Print - COMPACT & ROUNDED */}
           <div className="lg:col-span-1 space-y-4 print:hidden">
             
+             {/* SENDER DETAILS TOGGLE */}
+            <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+                <button 
+                    onClick={() => setShowSenderConfig(!showSenderConfig)}
+                    className="flex justify-between items-center w-full text-sm font-semibold mb-0"
+                >
+                    <span>Datos del Remitente</span>
+                    <span className="text-xs text-zinc-500">{showSenderConfig ? 'Ocultar' : 'Editar'}</span>
+                </button>
+                
+                {showSenderConfig && (
+                    <div className="mt-3 space-y-2 border-t border-zinc-200 pt-3 animate-fadeIn">
+                        <input type="text" placeholder="Tu Nombre / Empresa" value={senderName} onChange={(e) => setSenderName(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                        <input type="text" placeholder="Rol / Slogan" value={senderRole} onChange={(e) => setSenderRole(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                        <input type="text" placeholder="Email de contacto" value={senderEmail} onChange={(e) => setSenderEmail(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                        <input type="text" placeholder="Sitio Web (Footer)" value={senderWebsite} onChange={(e) => setSenderWebsite(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                    </div>
+                )}
+            </div>
+
+            {/* DESIGN CUSTOMIZATION TOGGLE */}
+            <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+                <button 
+                    onClick={() => setShowDesignConfig(!showDesignConfig)}
+                    className="flex justify-between items-center w-full text-sm font-semibold mb-0"
+                >
+                    <span>Personalización y Diseño</span>
+                    <span className="text-xs text-zinc-500">{showDesignConfig ? 'Ocultar' : 'Editar'}</span>
+                </button>
+                
+                {showDesignConfig && (
+                    <div className="mt-3 space-y-4 border-t border-zinc-200 pt-3 animate-fadeIn">
+                        
+                        {/* Reset Colors */}
+
+
+                        {/* Logo Config */}
+                        <div className="bg-white p-2 rounded-lg border border-zinc-200">
+                             <label className="flex items-center justify-between text-[10px] uppercase tracking-wide font-medium text-zinc-700 mb-2 cursor-pointer">
+                                 <span>¿Incluir Logotipo?</span>
+                                 <input 
+                                     type="checkbox" 
+                                     checked={includeLogo} 
+                                     onChange={(e) => {
+                                         setIncludeLogo(e.target.checked);
+                                         // Was checking if (!e.target.checked) setLogoImage(null); -- Removed to persist data
+                                     }}
+                                     className="accent-black"
+                                 />
+                             </label>
+                             
+                             {includeLogo && (
+                                 <div className="pt-2 border-t border-zinc-100 animate-fadeIn">
+                                     <label className="block text-zinc-500 text-[10px] mb-1">Subir imagen (Reemplaza *)</label>
+                                     <input type="file" accept="image/*" onChange={handleLogoUpload} className="w-full text-xs text-zinc-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300" />
+                                 </div>
+                             )}
+                        </div>
+
+                         {/* Signature Config - Improved Toggle */}
+                         <div className="bg-white p-2 rounded-lg border border-zinc-200">
+                            <label className="flex items-center justify-between text-[10px] uppercase tracking-wide font-medium text-zinc-700 mb-2 cursor-pointer">
+                                <span>¿Incluir Firma?</span>
+                                <input 
+                                    type="checkbox" 
+                                    checked={signatureMode !== 'none'} 
+                                    onChange={(e) => setSignatureMode(e.target.checked ? 'image' : 'none')}
+                                    className="accent-black"
+                                />
+                            </label>
+                            
+                            {signatureMode !== 'none' && (
+                                <div className="space-y-2 pt-2 border-t border-zinc-100 animate-fadeIn">
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setSignatureMode('image')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${signatureMode === 'image' ? 'bg-black text-white border-black' : 'hover:bg-zinc-50 border-zinc-200 text-zinc-600'}`}>Subir Imagen</button>
+                                        <button onClick={() => setSignatureMode('text')} className={`flex-1 text-[10px] py-1 rounded border transition-colors ${signatureMode === 'text' ? 'bg-black text-white border-black' : 'hover:bg-zinc-50 border-zinc-200 text-zinc-600'}`}>Escribir Texto</button>
+                                    </div>
+                                    
+                                    {signatureMode === 'image' && (
+                                        <input type="file" accept="image/*" onChange={handleSignatureUpload} className="w-full text-xs text-zinc-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300" />
+                                    )}
+                                    {signatureMode === 'text' && (
+                                        <input type="text" value={signatureText} onChange={(e) => setSignatureText(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" placeholder="Escribe tu firma..." />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Colors */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                                <label className="block text-zinc-500 text-[10px] uppercase tracking-wide font-medium">Colores</label>
+                                <div className="flex gap-1">
+                                    {Object.entries(THEMES).map(([key, theme]) => (
+                                        <button 
+                                            key={key}
+                                            onClick={() => applyTheme(key)}
+                                            className="text-[9px] px-2 py-1 rounded border border-zinc-200 hover:border-black hover:bg-zinc-50 transition-colors"
+                                            title={theme.name}
+                                        >
+                                            {theme.name.split(' ')[0]}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Fondo Cabecera</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={headerBg} onChange={(e) => setHeaderBg(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{headerBg}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Texto Cabecera</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={headerText} onChange={(e) => setHeaderText(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{headerText}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Fondo Página</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={bodyBg} onChange={(e) => setBodyBg(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{bodyBg}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Texto Página</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={bodyText} onChange={(e) => setBodyText(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{bodyText}</span>
+                                    </div>
+                                </div>
+                                <div className="col-span-2 border-t border-zinc-100 pt-2 mt-1">
+                                    <span className="text-[9px] text-zinc-400 block mb-1 font-bold">Resaltado (Tabla Total)</span>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Fondo Resaltado</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={highlightBg} onChange={(e) => setHighlightBg(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{highlightBg}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="text-[9px] text-zinc-400 block mb-1">Texto Resaltado</span>
+                                    <div className="flex items-center gap-2">
+                                        <input type="color" value={highlightText} onChange={(e) => setHighlightText(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0 shadow-sm" />
+                                        <span className="text-[9px] font-mono text-zinc-500">{highlightText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {hasCustomColors && (
+                            <div className="flex justify-end pt-2 border-t border-zinc-100">
+                                 <button onClick={resetColors} className="text-[10px] text-red-500 hover:text-red-700 underline">Restablecer Colores</button>
+                            </div>
+                        )}
+
+                    </div>
+                )}
+            </div>
+
+
              {/* Payment Method Config */}
              <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
               <h2 className="text-sm font-semibold mb-3">Método de Pago</h2>
@@ -207,7 +476,7 @@ Generated by noermorales.com
              </div>
 
             <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
-              <h2 className="text-sm font-semibold mb-3">Detalles</h2>
+              <h2 className="text-sm font-semibold mb-3">Detalles del Cliente</h2>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                     <div>
@@ -230,12 +499,13 @@ Generated by noermorales.com
                     </div>
                 </div>
                 <div>
-                  <label className="block text-zinc-500 text-[10px] mb-0.5 uppercase tracking-wide font-medium">Para:</label>
+                  <label className="block text-zinc-500 text-[10px] mb-0.5 uppercase tracking-wide font-medium">Nombre / Empresa</label>
                   <input
                     type="text"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
+                    placeholder="Cliente"
                   />
                 </div>
                  {/* Optional Client Fields */}
@@ -372,19 +642,6 @@ Generated by noermorales.com
                   </div>
                 ))}
                 
-                {/* Suggestions */}
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-zinc-200">
-                    {SUGGESTIONS.map((s, i) => (
-                    <button
-                        key={i}
-                        onClick={() => addSuggestion(s)}
-                        className="text-[10px] bg-white border border-zinc-200 hover:border-black text-zinc-600 hover:text-black px-2 py-0.5 rounded-full transition-colors"
-                    >
-                        + {s.name}
-                    </button>
-                    ))}
-                </div>
-
                 <div className="flex justify-between items-center text-xs font-medium pt-2 border-t border-zinc-200 px-1">
                     <span>Total Estimado:</span>
                     <span>${total.toFixed(2)}</span>
@@ -428,39 +685,50 @@ Generated by noermorales.com
           {/* PREVIEW / PRINT VIEW - COMPACT VERSION */}
           <div className="lg:col-span-2 lg:sticky lg:top-6 h-fit">
             <div 
-                className="bg-[#F9F9F7] text-[#1a1a1a] shadow-lg w-full max-w-[850px] mx-auto print:shadow-none print:w-full print:max-w-none print:min-h-0 relative flex flex-col font-inter print:bg-[#F9F9F7]"
+                className="shadow-lg w-full max-w-[850px] mx-auto print:shadow-none print:w-full print:max-w-none print:min-h-0 relative flex flex-col font-inter"
                 style={{ 
                     WebkitPrintColorAdjust: 'exact', 
                     printColorAdjust: 'exact',
-                    minHeight: '279.4mm' // US Letter Height
+                    minHeight: '279.4mm', // US Letter Height
+                    backgroundColor: bodyBg,
+                    color: bodyText
                 }}
             >
                 
                 {/* 1. Header Dark - Compact with Forced Print Color */}
                 <div 
-                    className="bg-[#2C2C2C] text-white p-8 pr-12 h-36 flex justify-between items-start relative overflow-hidden print:bg-[#2C2C2C]"
-                    style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact', backgroundColor: '#2C2C2C' }}
+                    className="p-8 pr-12 h-36 flex justify-between items-start relative overflow-hidden transition-colors"
+                    style={{ 
+                        WebkitPrintColorAdjust: 'exact', 
+                        printColorAdjust: 'exact', 
+                        backgroundColor: headerBg,
+                        color: headerText
+                    }}
                 >
                     <div className="z-10">
-                        <h1 className="text-4xl font-light tracking-wide mb-1 leading-none text-white print:text-white">Noelí Rodríguez</h1>
-                        <p className="text-xs tracking-[0.2em] font-light text-zinc-300 uppercase print:text-zinc-300">Soluciones Digitales</p>
+                        <h1 className="text-4xl font-light tracking-wide mb-1 leading-none capitalize" style={{ color: headerText }}>{senderName}</h1>
+                        <p className="text-xs tracking-[0.2em] font-light uppercase opacity-80" style={{ color: headerText }}>{senderRole}</p>
                     </div>
-                    {/* Decorative Star/Icon - Smaller */}
-                    <div className="text-white opacity-90 text-[60px] leading-none select-none print:text-white" style={{ fontFamily: 'monospace' }}>
-                        *
+                    {/* Decorative Logo or Asterisk */}
+                    <div className="opacity-90 leading-none select-none">
+                        {logoImage ? (
+                            <img src={logoImage} alt="Logo" className="h-16 w-16 object-contain" />
+                        ) : (
+                            <span className="text-[60px]" style={{ fontFamily: 'monospace', color: headerText }}>*</span>
+                        )}
                     </div>
                 </div>
 
                 <div className="p-8 pb-4 pt-6 flex-1 relative">
                      {/* 2. Top Info Row - Compact */}
                      <div className="flex justify-between items-end mb-8">
-                         <div className="text-xs text-zinc-600 font-medium">
+                         <div className="text-xs font-medium opacity-70">
                             Fecha: {getFormattedDate(date)}
                          </div>
                          <div className="text-right max-w-sm">
-                             <h2 className="text-3xl font-normal text-zinc-800 mb-1">Cotización</h2>
-                             <p className="text-[9px] leading-relaxed text-zinc-500 text-justify">
-                                Esta cotización es válida por 30 días. {notes && notes.length > 0 ? (notes.length > 150 ? notes.slice(0, 150) + '...' : notes) : 'Gracias.'}
+                             <h2 className="text-3xl font-normal mb-1 opacity-90">Cotización</h2>
+                             <p className="text-[9px] leading-relaxed opacity-60 text-justify">
+                                {notes && notes.length > 0 ? (notes.length > 150 ? notes.slice(0, 150) + '...' : notes) : 'Gracias.'}
                              </p>
                          </div>
                      </div>
@@ -474,9 +742,9 @@ Generated by noermorales.com
                             
                             {/* CLIENTE */}
                             <div>
-                                <h3 className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Cliente</h3>
-                                <p className="font-semibold text-zinc-800 text-xs mb-1">{clientName || 'Nombre del Cliente'}</p>
-                                <div className="text-[10px] text-zinc-500 space-y-0.5">
+                                <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-50 mb-2">Cliente</h3>
+                                <p className="font-semibold text-xs mb-1 opacity-90">{clientName || 'Nombre del Cliente'}</p>
+                                <div className="text-[10px] opacity-60 space-y-0.5">
                                     {clientAddress && <p>{clientAddress}</p>}
                                     {clientPhone && <p>{clientPhone}</p>}
                                     {clientEmail && <p>{clientEmail}</p>}
@@ -485,24 +753,24 @@ Generated by noermorales.com
 
                             {/* FOLIO */}
                             <div>
-                                <h3 className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Folio</h3>
-                                <p className="text-xs font-medium text-zinc-800">{quoteNumber}</p>
+                                <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-50 mb-1">Folio</h3>
+                                <p className="text-xs font-medium opacity-90">{quoteNumber}</p>
                             </div>
 
                             {/* PAYMENT METHOD */}
                             <div className="pt-8">
-                                <h3 className="text-[9px] font-bold uppercase tracking-wider text-zinc-800 mb-2">Método de Pago:</h3>
+                                <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-90 mb-2">Método de Pago:</h3>
                                 {paymentMethod === 'bank' ? (
-                                    <div className="text-[10px] text-zinc-500 space-y-1">
+                                    <div className="text-[10px] opacity-60 space-y-1">
                                         <p>Banco: {bankDetails.bank}</p>
                                         <p>Cuenta: {bankDetails.account}</p>
                                         <p>CLABE: {bankDetails.clabe}</p>
                                         <p>Titular: {bankDetails.holder}</p>
                                     </div>
                                 ) : (
-                                    <div className="text-[10px] text-zinc-500 space-y-1">
+                                    <div className="text-[10px] opacity-60 space-y-1">
                                         <p className="mb-2">Pagar en línea:</p>
-                                        <a href={paymentLink} target="_blank" className="inline-flex items-center justify-center bg-[#2C2C2C] text-white px-4 py-2 rounded text-[10px] font-medium tracking-wide hover:bg-black transition-colors">
+                                        <a href={paymentLink} target="_blank" className="inline-flex items-center justify-center px-4 py-2 rounded text-[10px] font-medium tracking-wide transition-colors" style={{ backgroundColor: headerBg, color: headerText }}>
                                             PAGAR AQUÍ
                                         </a>
                                     </div>
@@ -511,10 +779,10 @@ Generated by noermorales.com
 
                             {/* CONTACT */}
                             <div className="pt-4">
-                                <h3 className="text-[9px] font-bold uppercase tracking-wider text-zinc-800 mb-2">Contáctanos:</h3>
-                                <div className="text-[10px] text-zinc-500 space-y-1">
-                                    <p>noe.rmorales98@gmail.com</p>
-                                    <p>noermorales.com</p>
+                                <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-90 mb-2">Contáctanos:</h3>
+                                <div className="text-[10px] opacity-60 space-y-1">
+                                    <p>{senderEmail}</p>
+                                    <p>{senderWebsite}</p>
                                 </div>
                             </div>
 
@@ -524,18 +792,18 @@ Generated by noermorales.com
                          {/* RIGHT MAIN CONTENT (Table) */}
                          <div className="col-span-8">
                              {/* Project Title */}
-                             <div className="flex justify-between items-baseline border-b border-zinc-300 pb-2 mb-4">
-                                <div className="flex gap-2 text-[9px] font-bold uppercase tracking-wider text-zinc-800">
+                             <div className="flex justify-between items-baseline border-b border-zinc-300/30 pb-2 mb-4">
+                                <div className="flex gap-2 text-[9px] font-bold uppercase tracking-wider opacity-90">
                                     <span>Proyecto:</span>
-                                    <span className="text-zinc-500">{packageName || 'GENERAL'}</span>
+                                    <span className="opacity-60">{packageName || 'GENERAL'}</span>
                                 </div>
-                                <div className="text-[9px] font-bold uppercase tracking-wider text-zinc-800">
+                                <div className="text-[9px] font-bold uppercase tracking-wider opacity-90">
                                     Factura No. {quoteNumber}
                                 </div>
                              </div>
 
                              {/* Table Header */}
-                             <div className="grid grid-cols-12 gap-2 mb-2 text-[9px] font-bold uppercase tracking-wider text-zinc-600">
+                             <div className="grid grid-cols-12 gap-2 mb-2 text-[9px] font-bold uppercase tracking-wider opacity-60">
                                  <div className="col-span-1 text-center">No</div>
                                  <div className="col-span-5">Descripción</div>
                                  <div className="col-span-2 text-right">Precio</div>
@@ -548,19 +816,22 @@ Generated by noermorales.com
                                 {items.map((item, index) => (
                                     <div key={item.id} className="grid grid-cols-12 gap-2 text-[11px] items-center group relative py-1">
                                         {/* Highlight Bar for Total - Absolute Background */}
-                                        <div className="absolute right-0 top-[-2px] bottom-[-2px] w-[16.666%] bg-[#2C2C2C] -z-10 group-hover:bg-[#3a3a3a] print:bg-[#2C2C2C]"></div>
+                                        <div 
+                                            className="absolute right-0 top-[-2px] bottom-[-2px] w-[16.666%] -z-10 opacity-100 group-hover:opacity-90"
+                                            style={{ backgroundColor: highlightBg, color: highlightText }} 
+                                        ></div>
 
-                                        <div className="col-span-1 text-center text-zinc-500 font-light">{index + 1}</div>
-                                        <div className="col-span-5 text-zinc-800 font-medium pr-2 leading-tight">
+                                        <div className="col-span-1 text-center opacity-50 font-light">{index + 1}</div>
+                                        <div className="col-span-11 sm:col-span-5 opacity-90 font-medium pr-2 leading-tight">
                                             {item.name || 'Servicio'}
                                         </div>
-                                        <div className="col-span-2 text-right text-zinc-600">
+                                        <div className="hidden sm:block sm:col-span-2 text-right opacity-70">
                                             ${Number(item.price).toFixed(2)}
                                         </div>
-                                        <div className="col-span-2 text-center text-zinc-600 font-light">
+                                        <div className="hidden sm:block sm:col-span-2 text-center opacity-70 font-light">
                                             {item.quantity}
                                         </div>
-                                        <div className="col-span-2 text-center text-white font-medium z-10 px-2">
+                                        <div className="col-span-12 sm:col-span-2 text-center font-medium z-10 px-2" style={{ color: highlightText }}>
                                             ${(item.price * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
@@ -568,15 +839,15 @@ Generated by noermorales.com
                              </div>
 
                              {/* Totals Section */}
-                             <div className="grid grid-cols-12 gap-2 mt-4 pt-4 border-t border-zinc-300">
+                             <div className="grid grid-cols-12 gap-2 mt-4 pt-4 border-t border-zinc-300/30">
                                  <div className="col-span-6">
-                                     <h3 className="text-[10px] font-bold uppercase tracking-wider text-zinc-800 mb-1">Total a Pagar:</h3>
-                                     <p className="text-xl font-bold text-zinc-800">${total.toFixed(2)} {currency}</p>
+                                     <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-90 mb-1">Total a Pagar:</h3>
+                                     <p className="text-xl font-bold opacity-100">${total.toFixed(2)} {currency}</p>
                                  </div>
                                  <div className="col-span-6 space-y-1">
                                      {/* Math Breakdown */}
                                      {((includeIva && ivaMode === 'add') || (!includeIva)) && (
-                                         <div className="flex justify-between text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                                         <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
                                              <span>Subtotal</span>
                                              <span>${subtotal.toFixed(2)}</span>
                                          </div>
@@ -584,7 +855,7 @@ Generated by noermorales.com
 
                                      { /* Special Case: Inclusive taxes, show Raw Sum first? */ }
                                      {includeIva && ivaMode === 'inclusive' && (
-                                          <div className="flex justify-between text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                                          <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
                                              <span>Importe (Iva Incluido)</span>
                                              <span>${total.toFixed(2)}</span>
                                           </div>
@@ -593,19 +864,19 @@ Generated by noermorales.com
                                      {includeIva && (
                                          <>
                                             {ivaMode === 'inclusive' && (
-                                                <div className="flex justify-between text-[9px] text-zinc-500 uppercase tracking-wider pl-2 border-l-2 border-zinc-200">
+                                                <div className="flex justify-between text-[9px] opacity-60 uppercase tracking-wider pl-2 border-l-2 border-zinc-200/50">
                                                     <span>Subtotal Neto</span>
                                                     <span>${subtotal.toFixed(2)}</span>
                                                 </div>
                                             )}
-                                            <div className="flex justify-between text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                                            <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
                                                 <span>IVA ({ivaPercentage}%)</span>
                                                 <span>${taxAmount.toFixed(2)}</span>
                                             </div>
                                          </>
                                      )}
 
-                                     <div className="flex justify-between text-sm text-zinc-800 font-bold uppercase tracking-wider mt-2 pt-1 border-t border-zinc-200">
+                                     <div className="flex justify-between text-sm opacity-100 font-bold uppercase tracking-wider mt-2 pt-1 border-t border-zinc-300/30">
                                          <span>Total</span>
                                          <span>${total.toFixed(2)}</span>
                                      </div>
@@ -613,25 +884,32 @@ Generated by noermorales.com
                              </div>
 
                              {/* Approved By */}
-                             <div className="mt-12 text-right">
-                                 <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-600 mb-6">Aprobado Por</p>
-                                 <div className="inline-block relative">
-                                     {/* Signature Placeholder */}
-                                     <div className="h-16 w-32 mx-auto border-b border-zinc-800 mb-2 flex items-end justify-center">
-                                          <img src="/firma.png" alt="Firma Noelí Rodríguez" className="h-full object-contain pb-1 opacity-80" />
+                             {signatureMode !== 'none' && (
+                                 <div className="mt-12 text-right">
+                                     <p className="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-6">Aprobado Por</p>
+                                     <div className="inline-block relative">
+                                         {/* Signature Content */}
+                                         <div className="h-16 w-32 mx-auto border-b border-zinc-800/30 mb-2 flex items-end justify-center">
+                                          {signatureMode === 'image' && signatureImage && (
+                                             <img src={signatureImage} alt={`Firma ${senderName}`} className="h-full object-contain pb-1 opacity-80" />
+                                          )}
+                                          {signatureMode === 'text' && signatureText && (
+                                             <span className="font-cursive text-lg opacity-80 pb-1" style={{ fontFamily: 'cursive' }}>{signatureText}</span>
+                                          )}
+                                         </div>
+                                         <p className="font-bold text-xs opacity-90 uppercase">{senderName}</p>
+                                         <p className="text-[9px] opacity-60">@{senderWebsite}</p>
                                      </div>
-                                     <p className="font-bold text-xs text-zinc-800">NOELÍ RODRÍGUEZ</p>
-                                     <p className="text-[9px] text-zinc-500">@noermorales</p>
                                  </div>
-                             </div>
+                             )}
 
                          </div>
                      </div>
                 </div>
 
                 {/* Print Margin Fix / URL Branding */}
-                <div className="hidden print:block absolute bottom-4 left-0 w-full text-center text-[8px] text-zinc-300">
-                    noermorales.com
+                <div className="hidden print:block absolute bottom-4 left-0 w-full text-center text-[8px] opacity-30">
+                    {senderWebsite}
                 </div>
             </div>
           </div>

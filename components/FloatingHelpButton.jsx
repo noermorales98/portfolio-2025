@@ -10,9 +10,7 @@ export default function FloatingHelpButton() {
   const pathname = usePathname();
 
   // Don't show on the hidden quote generator page
-  if (pathname?.includes('hidden-quote')) {
-    return null;
-  }
+  if (pathname?.includes('/hidden-quote') || pathname?.includes('/quote')) return null;
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
