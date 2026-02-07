@@ -103,7 +103,7 @@ Me gustaría más información.`;
     };
 
     return (
-        <div id="cotizar" className="w-full px-[12%] py-20 scroll-mt-20">
+        <div id="cotizar" className="w-full px-[12%] py-20 scroll-mt-20 max-lg:px-[5%]">
              <motion.h4
                 initial={{ y: -20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
@@ -121,7 +121,7 @@ Me gustaría más información.`;
                 {step === 0 ? '¿Qué estás buscando?' : 'Personaliza tu plan'}
             </motion.h2>
 
-            <div className="max-w-4xl mx-auto bg-white dark:bg-transparent rounded-xl shadow-lg dark:shadow-none p-8 border border-gray-100 dark:border-gray-700">
+            <div className="max-w-5xl mx-auto bg-white dark:bg-transparent rounded-xl shadow-lg dark:shadow-none p-8 border border-gray-100 dark:border-gray-700">
                 
                 {/* STEP 0: Category Selection */}
                 {step === 0 && (
