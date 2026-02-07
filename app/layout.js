@@ -21,9 +21,9 @@ export const metadata = {
     siteName: "Noeli Rodriguez Portfolio",
     images: [
       {
-        url: "/share.jpg",
-        width: 1080,
-        height: 1350,
+        url: "/about-me.webp",
+        width: 1200,
+        height: 630,
         alt: "Noeli Rodriguez - Desarrollador Web y Creador de Contenido",
       },
     ],
@@ -34,7 +34,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Noeli Rodriguez | Servicios Digitales",
     description: "Noeli Rodriguez, desarrollador web y creador de contenido. Servicios de diseño web, contenido digital y automatización con IA.",
-    images: ["/share.jpg"],
+    images: ["/about-me.webp"],
     creator: "@noermorales", 
   },
   robots: {
