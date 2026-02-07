@@ -96,7 +96,7 @@ const Services = () => {
             <p className="text-sm text-gray-600 leading-5 dark:text-white/80 mb-6">
               {description}
             </p>
-            <a href={link} className="inline-flex items-center gap-2 px-4 py-2 border border-black dark:border-white rounded-full text-sm font-medium hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
+            <a href={link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-black dark:border-white rounded-full text-sm font-medium hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
               Leer más <Image alt="" src={assets.right_arrow} className="w-3 invert dark:invert-0 group-hover:invert-0" />
             </a>
           </motion.div>
