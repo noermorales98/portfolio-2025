@@ -8,7 +8,9 @@ import {
     ShoppingBasket01Icon, 
  
     ArrowLeft02Icon, 
-    WhatsappIcon 
+    WhatsappIcon,
+    AiChat02Icon,
+    CustomerService01Icon
 } from 'hugeicons-react';
 
 
@@ -26,6 +28,9 @@ const QuotationWizard = () => {
         { id: 'monthly', label: 'Planes Mensuales', description: 'Crecimiento continuo para redes y marca.', icon: Rocket01Icon },
         { id: 'web', label: 'Desarrollo Web', description: 'Sitios web profesionales (Pago único).', icon: Building03Icon },
         { id: 'design', label: 'Diseño y Multimedia', description: 'Flyers, Edición de Video y Kits.', icon: ShoppingBasket01Icon },
+        { id: 'ai', label: 'Integración con IA', description: 'Chatbots y Automatización de respuestas.', icon: AiChat02Icon },
+        { id: 'support', label: 'Soporte Técnico', description: 'Mantenimiento y Reparación de equipos.', icon: CustomerService01Icon },
+        { id: 'general_custom', label: 'Personalizada', description: '¿Tienes una idea única? Coticemos tu proyecto.', icon: ShoppingBasket01Icon },
     ];
 
     const packages = {
@@ -44,6 +49,16 @@ const QuotationWizard = () => {
             { id: 'video', label: 'Edición Video', price: 25, description: 'Video corto (<2min). Incluye 2 variantes.', icon: Building03Icon },
             { id: 'kit', label: 'Kit Social', price: 50, description: 'Paquete de 3 Flyers + 3 Videos cortos.', icon: ShoppingBasket01Icon },
             { id: 'custom', label: 'Personalizado', price: 0, description: 'Elige la cantidad exacta de flyers y videos que necesitas.', icon: ShoppingBasket01Icon }
+        ],
+        ai: [
+            { id: 'assistant', label: 'Asistente de Ventas', price: 100, description: 'Configuración inicial. (Software: $40/mes desde el 2º mes).', icon: AiChat02Icon },
+            { id: 'auto_reply', label: 'Respuestas Automáticas', price: 50, description: 'Configuración inicial. (Software: $15/mes desde el 2º mes).', icon: AiChat02Icon },
+        ],
+        support: [
+            { id: 'remote', label: 'Soporte Remoto', price: 30, description: 'Limpieza, optimización o instalación de programas (Vía Remota).', icon: CustomerService01Icon },
+        ],
+        general_custom: [
+            { id: 'custom_project', label: 'Proyecto a Medida', price: 0, description: 'Describe tu idea y crearemos un plan único para ti.', icon: Rocket01Icon },
         ]
     };
 
@@ -136,7 +151,7 @@ Me gustaría más información.`;
                             <ArrowLeft02Icon size={20} /> <span className="text-sm">Volver a categorías</span>
                         </div>
                         <h3 className="text-2xl font-Ovo mb-6 text-center">Selecciona un {category === 'monthly' ? 'Plan' : 'Paquete'}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className={`grid grid-cols-1 gap-6 ${packages[category]?.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'}`}>
                             {packages[category]?.map((pkg) => (
                                 <div 
                                     key={pkg.id} 
@@ -178,7 +193,7 @@ Me gustaría más información.`;
                             <textarea
                                 value={selections.note || ''}
                                 onChange={(e) => setSelections({ ...selections, note: e.target.value })}
-                                placeholder={selections.packageId === 'custom' ? "Hola, necesito X flyers y Y videos para mi proyecto de..." : "Escribe aquí tus ideas, dudas o requerimientos especiales..."}
+                                placeholder={selections.packageId === 'custom' || category === 'general_custom' ? "Cuéntame los detalles de tu proyecto..." : "Escribe aquí tus ideas, dudas o requerimientos especiales..."}
                                 className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none resize-none bg-gray-50 dark:bg-transparent dark:text-white"
                             ></textarea>
                          </div>
