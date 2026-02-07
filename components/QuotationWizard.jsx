@@ -6,7 +6,7 @@ import {
     Rocket01Icon, 
     Building03Icon, 
     ShoppingBasket01Icon, 
-    Tick02Icon, 
+ 
     ArrowLeft02Icon, 
     WhatsappIcon 
 } from 'hugeicons-react';
@@ -19,7 +19,7 @@ const QuotationWizard = () => {
     const [category, setCategory] = useState('');
     const [selections, setSelections] = useState({
         packageId: '',
-        features: [],
+        note: '',
     });
 
     const categories = [
@@ -46,11 +46,7 @@ const QuotationWizard = () => {
         ]
     };
 
-    const additionalFeatures = [
-        { id: 'seo', label: 'SEO Avanzado', value: 'SEO' },
-        { id: 'cms', label: 'Gestor de Contenidos', value: 'CMS' },
-        { id: 'analytics', label: 'Analíticas', value: 'Analytics' },
-    ];
+
 
     const handleCategorySelect = (catId) => {
         setCategory(catId);
@@ -62,14 +58,7 @@ const QuotationWizard = () => {
         setStep(2);
     };
 
-    const handleFeatureToggle = (featureValue) => {
-        const currentFeatures = selections.features;
-        if (currentFeatures.includes(featureValue)) {
-            setSelections({ ...selections, features: currentFeatures.filter(f => f !== featureValue) });
-        } else {
-            setSelections({ ...selections, features: [...currentFeatures, featureValue] });
-        }
-    };
+
 
     const getSelectedPackage = () => {
         if (!category || !selections.packageId) return null;
@@ -86,11 +75,11 @@ const QuotationWizard = () => {
         const price = calculatePrice();
         const catLabel = categories.find(c => c.id === category)?.label || 'Servicio';
         const pkgLabel = pkg ? pkg.label : 'N/A';
-        const featuresText = selections.features.length > 0 ? selections.features.join(', ') : 'Ninguna';
+        const noteText = selections.note ? selections.note : 'Ninguna nota adicional';
         
         const message = `Hola, me interesa un servicio de ${catLabel}.
 Paquete: ${pkgLabel}
-Extras: ${featuresText}
+Nota: ${noteText}
 Precio estimado: $${price} USD
 Me gustaría más información.`;
 
@@ -173,22 +162,19 @@ Me gustaría más información.`;
                 {step === 2 && (
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                          <h3 className="text-2xl font-Ovo mb-6 text-center">¿Deseas agregar algo más?</h3>
-                         <div className="space-y-4 mb-8 max-w-lg mx-auto">
-                             {additionalFeatures.map((feature) => (
-                                 <div 
-                                    key={feature.id}
-                                    onClick={() => handleFeatureToggle(feature.value)}
-                                    className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${selections.features.includes(feature.value) ? 'border-black dark:border-white bg-gray-50 dark:bg-gray-800' : 'border-gray-200 dark:border-gray-600'}`}
-                                 >
-                                     <span className="font-medium">{feature.label}</span>
-                                     <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${selections.features.includes(feature.value) ? 'bg-black dark:bg-white border-black dark:border-white' : 'border-gray-300'}`}>
-                                         {selections.features.includes(feature.value) && (
-                                             <Tick02Icon size={14} className="text-white dark:text-black" />
-                                         )}
-                                     </div>
-                                 </div>
-                             ))}
+                         <p className="text-center text-gray-500 dark:text-gray-400 mb-8 max-w-lg mx-auto">
+                             Cuéntanos más detalles sobre tu proyecto o necesidades específicas.
+                         </p>
+
+                         <div className="max-w-2xl mx-auto mb-8">
+                            <textarea
+                                value={selections.note || ''}
+                                onChange={(e) => setSelections({ ...selections, note: e.target.value })}
+                                placeholder="Escribe aquí tus ideas, dudas o requerimientos especiales..."
+                                className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none resize-none bg-gray-50 dark:bg-gray-800 dark:text-white"
+                            ></textarea>
                          </div>
+
                          <div className="flex justify-between mt-8">
                              <button
                                onClick={() => setStep(1)}
