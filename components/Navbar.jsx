@@ -41,7 +41,6 @@ const Navbar = ({isDarkMode, setIsDarkMode}) => {
             <li><a className='font-Ovo' href="#services">Servicios</a></li>
             <li><a className='font-Ovo' href="#work">Mi Trabajo</a></li>
             <li><a className='font-Ovo' href="#cotizar">Cotizar</a></li>
-            <li><a className='font-Ovo' href="#contact">Contáctame</a></li>
         </ul>
 
         <div className='flex items-center gap-4'>
@@ -50,7 +49,7 @@ const Navbar = ({isDarkMode, setIsDarkMode}) => {
                 <Image src={isDarkMode ? assets.sun_icon : assets.moon_icon} alt='' className='w-6' />
             </button>
 
-            <a href="https://zcal.co/noermorales/agendar" target='_blank' className='hidden lg:flex items-center gap-3 px-10 py-2.5 border border-gray-500 rounded-full ml-4 font-Ovo dark:border-white/50'>Contacto 
+            <a href="#contact" className='hidden lg:flex items-center gap-3 px-10 py-2.5 border border-gray-500 rounded-full ml-4 font-Ovo dark:border-white/50'>Contacto 
             <Image src={isDarkMode ? assets.arrow_icon_dark : assets.arrow_icon} alt="" className='w-3'/></a>
 
             <button className='block md:hidden ml-3' onClick={openMenu}>
@@ -71,7 +70,7 @@ const Navbar = ({isDarkMode, setIsDarkMode}) => {
             <li><a className='font-Ovo' onClick={closeMenu} href="#services">Servicios</a></li>
             <li><a className='font-Ovo' onClick={closeMenu} href="#work">Mi Trabajo</a></li>
             <li><a className='font-Ovo' onClick={closeMenu} href="#cotizar">Cotizar</a></li>
-            <li><a className='font-Ovo' onClick={closeMenu} href="#contact">Contáctame</a></li>
+            <li><a className='font-Ovo' onClick={closeMenu} href="#contact">Contacto</a></li>
         </ul>
 
 

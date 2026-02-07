@@ -1,35 +1,16 @@
 import { assets } from "@/assets/assets";
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "motion/react";
+import { 
+    WhatsappIcon, 
+    Mail01Icon, 
+    InstagramIcon, 
+    Linkedin01Icon,
+    ArrowRight02Icon
+} from 'hugeicons-react';
 
 const Contact = () => {
-  const [result, setResult] = useState("");
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("Sending....");
-    const formData = new FormData(event.target);
-
-    // Enter your web3 froms access key below
-    formData.append("access_key", "------Enter Access Key Here-------");
-
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      setResult("Form Submitted Successfully");
-      event.target.reset();
-    } else {
-      console.log("Error", data);
-      setResult(data.message);
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -53,7 +34,7 @@ const Contact = () => {
         transition={{ delay: 0.5, duration: 0.5 }}
         className="text-center text-5xl font-Ovo flex items-center justify-center gap-2 flex-wrap"
       >
-        <span>¡Hablemos sin compromiso!</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
+        <span>¡Hablemos!</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
       </motion.h2>
 
       <motion.p
@@ -62,24 +43,60 @@ const Contact = () => {
         transition={{ delay: 0.7, duration: 0.5 }}
         className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo"
       >
-        ¡Me encantaría saber de ti! Si tienes dudas, comentarios o simplemente
-        quieres platicar, mándame un mensaje directo por redes o agenda una
-        charla rápida en mi calendario. ¡Aquí estoy para escucharte!
+        Si tienes alguna duda o quieres cotizar un proyecto, elige la opción que prefieras:
       </motion.p>
 
-      <div className="flex flex-col items-center gap-4 mt-4">
+      <div className="flex flex-col md:flex-row justify-center gap-6 max-w-2xl mx-auto">
         <motion.a
-          initial={{ y: 30, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1 }}
-          href="mailto:noe.rmorales98@gmail.com"
-          target="_blank"
-          className="px-10 py-3 border border-white rounded-full bg-black text-white flex items-center gap-2 dark:bg-transparent"
+            whileHover={{ scale: 1.05 }}
+            href="https://wa.me/525642663875"
+            target="_blank"
+            className="flex-1 border border-gray-300 rounded-xl p-8 hover:bg-green-50 hover:border-green-500 cursor-pointer transition-all dark:border-gray-600 dark:hover:bg-green-900/20 text-center flex flex-col items-center gap-4 group"
         >
-          contáctame{" "}
-          <Image src={assets.right_arrow_white} alt="" className="w-4" />
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 dark:bg-green-900 dark:text-green-400">
+                <WhatsappIcon size={24} variant="solid" />
+            </div>
+            <div>
+                <h3 className="font-bold text-lg mb-1">WhatsApp</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Respuesta rápida</p>
+            </div>
+            <span className="text-sm font-semibold flex items-center gap-1 group-hover:underline">
+                Enviar mensaje <ArrowRight02Icon size={14} />
+            </span>
+        </motion.a>
+
+        <motion.a
+            whileHover={{ scale: 1.05 }}
+            href="mailto:noe.rmorales98@gmail.com"
+            className="flex-1 border border-gray-300 rounded-xl p-8 hover:bg-blue-50 hover:border-blue-500 cursor-pointer transition-all dark:border-gray-600 dark:hover:bg-blue-900/20 text-center flex flex-col items-center gap-4 group"
+        >
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                <Mail01Icon size={24} variant="solid" />
+            </div>
+            <div>
+                <h3 className="font-bold text-lg mb-1">Correo</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">noe.rmorales98@gmail.com</p>
+            </div>
+            <span className="text-sm font-semibold flex items-center gap-1 group-hover:underline">
+                Enviar correo <ArrowRight02Icon size={14} />
+            </span>
         </motion.a>
       </div>
+
+      <div className="mt-16 text-center">
+          <p className="text-gray-500 dark:text-gray-400 mb-6 font-Ovo">También puedes encontrarme en:</p>
+          <div className="flex items-center justify-center gap-8">
+              <a href="https://instagram.com/noermorales" target="_blank" className="flex items-center gap-2 hover:-translate-y-1 transition-transform">
+                  <InstagramIcon size={24} />
+                  <span className="font-semibold">@noermorales</span>
+              </a>
+              <a href="https://www.linkedin.com/in/noermorales/" target="_blank" className="flex items-center gap-2 hover:-translate-y-1 transition-transform">
+                  <Linkedin01Icon size={24} />
+                  <span className="font-semibold">LinkedIn</span>
+              </a>
+          </div>
+      </div>
+
     </motion.div>
   );
 };

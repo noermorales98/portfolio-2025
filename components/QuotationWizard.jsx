@@ -99,7 +99,7 @@ Nota: ${noteText}
 Precio estimado: $${price} USD
 Me gustaría más información.`;
 
-        return `https://wa.me/529981725547?text=${encodeURIComponent(message)}`;
+        return `https://wa.me/525642663875?text=${encodeURIComponent(message)}`;
     };
 
     return (
@@ -241,6 +241,7 @@ Me gustaría más información.`;
                             href={getWhatsAppLink()} 
                             target="_blank" 
                             rel="noopener noreferrer"
+                            onClick={() => setTimeout(() => setSelections({ ...selections, note: '' }), 1000)}
                             className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-[#25D366] text-white rounded-full font-bold hover:bg-[#20b85c] transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         >
                             <WhatsappIcon size={24} variant="solid" />

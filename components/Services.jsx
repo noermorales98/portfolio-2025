@@ -85,7 +85,7 @@ const Services = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             key={index}
-            className="border border-gray-400 rounded-lg px-8 py-12 hover:shadow-black cursor-pointer hover:bg-lightHover hover:-translate-y-1 duration-500 dark:hover:bg-darkHover dark:hover:shadow-white"
+            className="border border-gray-400 rounded-lg px-8 py-12 hover:shadow-black hover:bg-lightHover hover:-translate-y-1 duration-500 dark:hover:bg-darkHover dark:hover:shadow-white"
           >
             <div className="w-10 h-10 mb-4 text-gray-700 dark:text-white">
                 <Icon size={40} className="stroke-[1.5]" />
@@ -93,11 +93,11 @@ const Services = () => {
             <h3 className="text-lg my-4 text-gray-700 dark:text-white">
               {title}
             </h3>
-            <p className="text-sm text-gray-600 leading-5 dark:text-white/80">
+            <p className="text-sm text-gray-600 leading-5 dark:text-white/80 mb-6">
               {description}
             </p>
-            <a href={link} className="flex items-center gap-2 text-sm mt-5">
-              Leer más <Image alt="" src={assets.right_arrow} className="w-4" />
+            <a href={link} className="inline-flex items-center gap-2 px-4 py-2 border border-black dark:border-white rounded-full text-sm font-medium hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
+              Leer más <Image alt="" src={assets.right_arrow} className="w-3 invert dark:invert-0 group-hover:invert-0" />
             </a>
           </motion.div>
         ))}
