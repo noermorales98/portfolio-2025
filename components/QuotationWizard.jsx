@@ -40,9 +40,10 @@ const QuotationWizard = () => {
             { id: 'store', label: 'Tienda Online', price: 550, description: 'E-commerce completo con gestión de pagos.', icon: ShoppingBasket01Icon },
         ],
         design: [
-            { id: 'flyer', label: 'Flyer Redes', price: 20, description: 'Diseño profesional para redes sociales.', icon: Rocket01Icon },
+            { id: 'flyer', label: 'Flyer Individual', price: 20, description: 'Diseño profesional de 1 Flyer para redes sociales.', icon: Rocket01Icon },
             { id: 'video', label: 'Edición Video', price: 25, description: 'Video corto (<2min). Incluye 2 variantes.', icon: Building03Icon },
             { id: 'kit', label: 'Kit Social', price: 50, description: 'Paquete de 3 Flyers + 3 Videos cortos.', icon: ShoppingBasket01Icon },
+            { id: 'custom', label: 'Personalizado', price: 0, description: 'Elige la cantidad exacta de flyers y videos que necesitas.', icon: ShoppingBasket01Icon }
         ]
     };
 
@@ -149,9 +150,16 @@ Me gustaría más información.`;
                                         <h4 className="font-bold text-lg mb-2">{pkg.label}</h4>
                                         <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">{pkg.description}</p>
                                     </div>
-                                    <span className="inline-block px-4 py-1 bg-gray-100 dark:bg-gray-800 dark:text-white rounded-full text-sm font-semibold mt-2">
-                                        ${pkg.price} USD
-                                    </span>
+                                    {pkg.price > 0 && (
+                                        <span className="inline-block px-4 py-1 bg-gray-100 dark:bg-gray-800 dark:text-white rounded-full text-sm font-semibold mt-2">
+                                            ${pkg.price} USD
+                                        </span>
+                                    )}
+                                    {pkg.price === 0 && (
+                                        <span className="inline-block px-4 py-1 bg-gray-100 dark:bg-gray-800 dark:text-white rounded-full text-sm font-semibold mt-2">
+                                            A la medida
+                                        </span>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -170,7 +178,7 @@ Me gustaría más información.`;
                             <textarea
                                 value={selections.note || ''}
                                 onChange={(e) => setSelections({ ...selections, note: e.target.value })}
-                                placeholder="Escribe aquí tus ideas, dudas o requerimientos especiales..."
+                                placeholder={selections.packageId === 'custom' ? "Hola, necesito X flyers y Y videos para mi proyecto de..." : "Escribe aquí tus ideas, dudas o requerimientos especiales..."}
                                 className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none resize-none bg-gray-50 dark:bg-transparent dark:text-white"
                             ></textarea>
                          </div>
@@ -201,7 +209,13 @@ Me gustaría más información.`;
                                 {getSelectedPackage()?.label}
                             </h3>
                             <div className="text-6xl font-bold text-black dark:text-white my-6">
-                                ${calculatePrice()} <span className="text-2xl font-normal text-gray-500">USD</span>
+                                {calculatePrice() === 0 ? (
+                                    <span className="text-5xl">A Cotizar</span>
+                                ) : (
+                                    <>
+                                        ${calculatePrice()} <span className="text-2xl font-normal text-gray-500">USD</span>
+                                    </>
+                                )}
                             </div>
                             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
                                 *Esto es un estimado. Para confirmar disponibilidad y detalles, envíame un mensaje.
