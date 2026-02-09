@@ -9,8 +9,7 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
   const [senderEmail, setSenderEmail] = useState(initialData.senderEmail || 'contacto@ejemplo.com');
   const [senderWebsite, setSenderWebsite] = useState(initialData.senderWebsite || 'www.tuejemplo.com');
   
-  const [showSenderConfig, setShowSenderConfig] = useState(false);
-  const [showDesignConfig, setShowDesignConfig] = useState(false);
+
 
   // Customization State
   const [logoImage, setLogoImage] = useState(initialData.logoImage || null);
@@ -139,12 +138,10 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
   const [clientName, setClientName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [packageName, setPackageName] = useState('');
-  const [quoteNumber, setQuoteNumber] = useState('');
 
-  useEffect(() => {
-    setQuoteNumber(Date.now().toString().slice(-6));
-  }, []);
-  
+  const [quoteNumber, setQuoteNumber] = useState('');
+  const [validUntil, setValidUntil] = useState('30 días');
+
   // New Fields
   const [currency, setCurrency] = useState('USD'); // Default to USD text
   const [clientAddress, setClientAddress] = useState('');
@@ -168,6 +165,118 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
     a4: { name: 'A4', css: '210mm 297mm', width: '210mm', height: '297mm' },
     legal: { name: 'Oficio (Legal)', css: '8.5in 14in', width: '215.9mm', height: '355.6mm' },
   };
+
+  // Zoom State
+  const [zoom, setZoom] = useState(0.8);
+
+  const calculateDefaultZoom = () => {
+    // We want to fit the page in the available main area with some padding
+    // Assuming sidebars are roughly 320px each and some padding in main
+    const mainArea = document.querySelector('main');
+    if (!mainArea) return;
+
+    const padding = 64; // Horizontal padding (32px each side)
+    const topPadding = 48; // Vertical padding
+    
+    const availableWidth = mainArea.clientWidth - padding;
+    const availableHeight = mainArea.clientHeight - topPadding;
+    
+    // Convert current page size to pixels (approx 96 DPI)
+    const pageWidthPx = parseFloat(PAGE_SIZES[pageSize].width) * 3.7795275591;
+    const pageHeightPx = parseFloat(PAGE_SIZES[pageSize].height) * 3.7795275591;
+
+    const scaleX = availableWidth / pageWidthPx;
+    const scaleY = availableHeight / pageHeightPx;
+    
+    // Choose the smaller scale to ensure it fits both ways, and cap at 1.0 or custom
+    const fitScale = Math.min(scaleX, scaleY, 1) * 0.95; // 0.95 for a bit of extra breathing room
+    setZoom(fitScale);
+  };
+
+  // Recalculate zoom on mount, resize, or page size change
+  useEffect(() => {
+    calculateDefaultZoom();
+    window.addEventListener('resize', calculateDefaultZoom);
+    return () => window.removeEventListener('resize', calculateDefaultZoom);
+  }, [pageSize]);
+
+  // Load from LocalStorage on Mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('quote_dashboard_data');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.senderName) setSenderName(parsed.senderName);
+        if (parsed.senderRole) setSenderRole(parsed.senderRole);
+        if (parsed.senderEmail) setSenderEmail(parsed.senderEmail);
+        if (parsed.senderWebsite) setSenderWebsite(parsed.senderWebsite);
+        if (parsed.logoImage) { setLogoImage(parsed.logoImage); setIncludeLogo(true); }
+        if (parsed.signatureMode) setSignatureMode(parsed.signatureMode);
+        if (parsed.signatureImage) setSignatureImage(parsed.signatureImage);
+        if (parsed.signatureText) setSignatureText(parsed.signatureText);
+        
+        if (parsed.headerBg) setHeaderBg(parsed.headerBg);
+        if (parsed.headerText) setHeaderText(parsed.headerText);
+        if (parsed.bodyBg) setBodyBg(parsed.bodyBg);
+        if (parsed.bodyText) setBodyText(parsed.bodyText);
+        if (parsed.highlightBg) setHighlightBg(parsed.highlightBg);
+        if (parsed.highlightText) setHighlightText(parsed.highlightText);
+        
+        if (parsed.paymentMethod) setPaymentMethod(parsed.paymentMethod);
+        if (parsed.paymentLink) setPaymentLink(parsed.paymentLink);
+        if (parsed.bankDetails) setBankDetails(parsed.bankDetails);
+        
+        if (parsed.clientName) setClientName(parsed.clientName);
+        if (parsed.date) setDate(parsed.date);
+        if (parsed.packageName) setPackageName(parsed.packageName);
+        if (parsed.quoteNumber) setQuoteNumber(parsed.quoteNumber);
+        if (parsed.validUntil) setValidUntil(parsed.validUntil);
+        
+        if (parsed.currency) setCurrency(parsed.currency);
+        if (parsed.clientAddress) setClientAddress(parsed.clientAddress);
+        if (parsed.clientEmail) setClientEmail(parsed.clientEmail);
+        if (parsed.clientPhone) setClientPhone(parsed.clientPhone);
+        if (parsed.notes) setNotes(parsed.notes);
+        
+        if (parsed.items) setItems(parsed.items);
+        if (parsed.includeIva !== undefined) setIncludeIva(parsed.includeIva);
+        if (parsed.ivaPercentage) setIvaPercentage(parsed.ivaPercentage);
+        if (parsed.ivaMode) setIvaMode(parsed.ivaMode);
+        if (parsed.pageSize) setPageSize(parsed.pageSize);
+
+      } catch (e) {
+        console.error('Error loading data', e);
+      }
+    } else {
+         setQuoteNumber(Date.now().toString().slice(-6));
+    }
+  }, []);
+
+  // Save to LocalStorage on Change
+  useEffect(() => {
+    const dataToSave = {
+        senderName, senderRole, senderEmail, senderWebsite,
+        logoImage, signatureMode, signatureImage, signatureText,
+        headerBg, headerText, bodyBg, bodyText, highlightBg, highlightText,
+        paymentMethod, paymentLink, bankDetails,
+        clientName, date, packageName, quoteNumber, validUntil,
+        currency, clientAddress, clientEmail, clientPhone, notes,
+        items, includeIva, ivaPercentage, ivaMode, pageSize
+    };
+    // Debounce slightly to avoid excessive writes
+    const timeoutId = setTimeout(() => {
+        localStorage.setItem('quote_dashboard_data', JSON.stringify(dataToSave));
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [
+    senderName, senderRole, senderEmail, senderWebsite,
+    logoImage, signatureMode, signatureImage, signatureText,
+    headerBg, headerText, bodyBg, bodyText, highlightBg, highlightText,
+    paymentMethod, paymentLink, bankDetails,
+    clientName, date, packageName, quoteNumber, validUntil,
+    currency, clientAddress, clientEmail, clientPhone, notes,
+    items, includeIva, ivaPercentage, ivaMode, pageSize
+  ]);
 
   // --- Helpers ---
   const addItem = () => {
@@ -368,7 +477,7 @@ Generated by ${senderWebsite}
                       </select>
                   </div>
                   
-                  <div className="flex items-center gap-2 px-2">
+                  <div className="flex items-center gap-2 px-2 border-r border-zinc-200">
                       <span className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider">Moneda</span>
                       <input 
                         className="bg-transparent w-12 text-xs font-bold text-zinc-700 focus:outline-none text-center uppercase"
@@ -376,6 +485,30 @@ Generated by ${senderWebsite}
                         onChange={(e) => setCurrency(e.target.value)}
                         placeholder="MXN"
                       />
+                  </div>
+
+                  <div className="flex items-center gap-1 px-2">
+                       <button 
+                         onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
+                         className="p-1 hover:bg-zinc-200 rounded text-zinc-600 transition-colors"
+                         title="Zoom Out"
+                       >
+                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                       </button>
+                       <button 
+                         onClick={calculateDefaultZoom}
+                         className="px-1.5 py-0.5 hover:bg-zinc-200 rounded text-[10px] font-bold text-zinc-700 transition-colors min-w-[40px]"
+                         title="Ajustar"
+                       >
+                         {Math.round(zoom * 100)}%
+                       </button>
+                       <button 
+                         onClick={() => setZoom(Math.min(2, zoom + 0.1))}
+                         className="p-1 hover:bg-zinc-200 rounded text-zinc-600 transition-colors"
+                         title="Zoom In"
+                       >
+                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                       </button>
                   </div>
              </div>
 
@@ -406,45 +539,343 @@ Generated by ${senderWebsite}
         {/* 2. EDITOR WORKSPACE */}
         <div className="flex-1 flex overflow-hidden">
              
-             {/* LEFT SIDEBAR - SETTINGS */}
-             <aside className="w-80 lg:w-96 bg-white border-r border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col">
+             {/* LEFT SIDEBAR - SENDER, CLIENT, SERVICES */}
+             <aside className="w-80 bg-white border-r border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0">
+                 <div className="p-4 border-b border-zinc-100">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Datos y Servicios</h2>
+                 </div>
+                 
+                 <div className="p-4 space-y-6 pb-20">
+                     {/* SENDER DETAILS */}
+                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                        <h3 className="text-xs font-semibold mb-3">Datos del Remitente</h3>
+                        <div className="space-y-2">
+                                <input type="text" placeholder="Tu Nombre / Empresa" value={senderName} onChange={(e) => setSenderName(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                                <input type="text" placeholder="Rol / Slogan" value={senderRole} onChange={(e) => setSenderRole(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                                <input type="text" placeholder="Email de contacto" value={senderEmail} onChange={(e) => setSenderEmail(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                                <input type="text" placeholder="Sitio Web (Footer)" value={senderWebsite} onChange={(e) => setSenderWebsite(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                        </div>
+                     </div>
+
+
+                     {/* QUOTE DETAILS (NEW) */}
+                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                        <h2 className="text-xs font-semibold mb-3">Detalles de la Cotización</h2>
+                        <div className="space-y-2">
+                             <div>
+                                <label className="text-[10px] text-zinc-500 font-medium">Fecha</label>
+                                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                             </div>
+                             <div>
+                                <label className="text-[10px] text-zinc-500 font-medium">Cotización #</label>
+                                <input type="text" placeholder="#" value={quoteNumber} onChange={(e) => setQuoteNumber(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                             </div>
+                             <div>
+                                <label className="text-[10px] text-zinc-500 font-medium">Válido hasta</label>
+                                <input type="text" placeholder="Ej: 30 días, 15 de Marzo..." value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                             </div>
+                        </div>
+                     </div>
+
+                     {/* CLIENT DETAILS */}
+                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                        <h2 className="text-xs font-semibold mb-3">Detalles del Cliente</h2>
+                        <div className="space-y-2">
+                            <input type="text" placeholder="Nombre del Cliente" value={clientName} onChange={(e) => setClientName(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                            <input type="text" placeholder="Dirección" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                            <input type="text" placeholder="Email Cliente" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                            <input type="text" placeholder="Teléfono" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
+                        </div>
+                     </div>
+
+
+                     {/* SERVICES */}
+                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                        <div className="flex justify-between items-center mb-3">
+                            <h2 className="text-xs font-semibold">Servicios</h2>
+                            <button onClick={addItem} className="text-[10px] bg-black text-white px-2 py-1 rounded hover:bg-zinc-800 transition-colors">
+                                + Agregar
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            {items.map((item) => (
+                                <div key={item.id} className="bg-white border border-zinc-200 p-2 rounded-lg space-y-2">
+                                    <div className="flex justify-between gap-2">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Descripción" 
+                                            value={item.name} 
+                                            onChange={(e) => updateItem(item.id, 'name', e.target.value)} 
+                                            className="flex-1 bg-zinc-50 border-0 rounded p-1 text-[10px] focus:ring-1 focus:ring-black outline-none" 
+                                        />
+                                        <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <label className="text-[8px] text-zinc-400 uppercase font-bold">Precio</label>
+                                            <input 
+                                                type="number" 
+                                                value={item.price} 
+                                                onChange={(e) => updateItem(item.id, 'price', Number(e.target.value))} 
+                                                className="w-full bg-zinc-50 border-0 rounded p-1 text-[10px] focus:ring-1 focus:ring-black outline-none" 
+                                            />
+                                        </div>
+                                        <div className="w-16">
+                                            <label className="text-[8px] text-zinc-400 uppercase font-bold">Cant.</label>
+                                            <input 
+                                                type="number" 
+                                                value={item.quantity} 
+                                                onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))} 
+                                                className="w-full bg-zinc-50 border-0 rounded p-1 text-[10px] focus:ring-1 focus:ring-black outline-none text-center" 
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-4 pt-3 border-t border-zinc-200 space-y-2">
+                             <div className="flex items-center justify-between">
+                                 <label className="text-[10px] font-medium cursor-pointer flex items-center gap-2">
+                                     <input 
+                                         type="checkbox" 
+                                         checked={includeIva} 
+                                         onChange={(e) => setIncludeIva(e.target.checked)}
+                                         className="accent-black rounded"
+                                     />
+                                     <span>Aplicar IVA</span>
+                                 </label>
+                                 {includeIva && (
+                                     <div className="flex items-center gap-1">
+                                         <input 
+                                             type="number" 
+                                             value={ivaPercentage} 
+                                             onChange={(e) => setIvaPercentage(Number(e.target.value))}
+                                             className="w-8 text-[10px] border border-zinc-200 rounded p-0.5 text-center"
+                                         />
+                                         <span className="text-[10px]">%</span>
+                                     </div>
+                                 )}
+                             </div>
+                             
+                             {includeIva && (
+                                 <div className="flex h-6 bg-zinc-100 rounded p-0.5">
+                                     <button 
+                                        onClick={() => setIvaMode('add')}
+                                        className={`flex-1 text-[9px] rounded transition-all ${ivaMode === 'add' ? 'bg-white shadow-sm font-medium text-black' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                     >
+                                         + IVA
+                                     </button>
+                                     <button 
+                                        onClick={() => setIvaMode('inclusive')}
+                                        className={`flex-1 text-[9px] rounded transition-all ${ivaMode === 'inclusive' ? 'bg-white shadow-sm font-medium text-black' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                     >
+                                         Incluido
+                                     </button>
+                                 </div>
+                             )}
+
+                             <div className="flex justify-between items-center pt-2">
+                                 <span className="text-[10px] font-bold uppercase text-zinc-500">Total Est.</span>
+                                 <span className="text-sm font-bold">${total.toFixed(2)}</span>
+                             </div>
+                        </div>
+                     </div>
+                 </div>
+             </aside>
+
+             {/* MAIN CONTENT - PREVIEW */}
+              <main className="flex-1 bg-zinc-100/50 relative overflow-auto flex justify-center p-8 lg:p-12 print:p-0 print:bg-white print:block">
+                  <div 
+                    className="origin-top transition-transform duration-200 ease-out"
+                    style={{ 
+                        transform: `scale(${zoom})`,
+                        marginBottom: `calc(-${(1 - zoom) * 100}%)` // Adjust for scale taking up same original space
+                    }}
+                  >
+                     {/* Dynamic Page Layout */}
+                    <div 
+                        id="quote-preview"
+                        className="shadow-2xl mx-auto print:shadow-none print:w-full print:max-w-none print:min-h-0 relative flex flex-col font-inter transition-all duration-300 ease-in-out bg-white"
+                        style={{ 
+                            WebkitPrintColorAdjust: 'exact', 
+                            printColorAdjust: 'exact',
+                            width: PAGE_SIZES[pageSize].width,
+                            height: PAGE_SIZES[pageSize].height,
+                            overflow: 'hidden',
+                            backgroundColor: bodyBg,
+                            color: bodyText
+                        }}
+                    >
+                        
+                        {/* 1. Header Dark - Compact with Forced Print Color */}
+                        <div 
+                            className="p-8 pr-12 h-36 flex justify-between items-start relative overflow-hidden transition-colors"
+                            style={{ 
+                                WebkitPrintColorAdjust: 'exact', 
+                                printColorAdjust: 'exact', 
+                                backgroundColor: headerBg,
+                                color: headerText
+                            }}
+                        >
+                            <div className="z-10">
+                                <h1 className="text-4xl font-light tracking-wide mb-1 leading-none capitalize" style={{ color: headerText }}>{senderName}</h1>
+                                <p className="text-xs tracking-[0.2em] font-light uppercase opacity-80" style={{ color: headerText }}>{senderRole}</p>
+                            </div>
+                            {/* Decorative Logo or Asterisk */}
+                            <div className="opacity-90 leading-none select-none">
+                                {includeLogo && (
+                                    logoImage ? (
+                                        <img src={logoImage} alt="Logo" className="h-16 w-16 object-contain" />
+                                    ) : (
+                                        <span className="text-[60px]" style={{ fontFamily: 'monospace', color: headerText }}>*</span>
+                                    )
+                                )}
+                            </div>
+                         </div>
+
+                        {/* 2. Client Info Bar */}
+                         <div className="bg-zinc-50 border-b border-zinc-100 p-6 flex justify-between items-start text-xs">
+                             <div className="space-y-1">
+                                 <h3 className="font-bold uppercase tracking-wider text-zinc-400 mb-2">Para</h3>
+                                 <p className="font-semibold text-lg">{clientName || 'Nombre del Cliente'}</p>
+                                 <p className="text-zinc-500">{clientAddress || 'Dirección del Cliente'}</p>
+                                 <div className="flex gap-4 mt-1 text-zinc-400">
+                                     {clientEmail && <span>{clientEmail}</span>}
+                                     {clientPhone && <span>{clientPhone}</span>}
+                                 </div>
+                             </div>
+                             <div className="text-right space-y-1">
+                                 <h3 className="font-bold uppercase tracking-wider text-zinc-400 mb-2">Detalles</h3>
+                                 <div className="flex justify-between gap-8">
+                                     <span className="text-zinc-400">Fecha:</span>
+                                     <span className="font-medium">{getFormattedDate(date)}</span>
+                                 </div>
+                                 <div className="flex justify-between gap-8">
+                                     <span className="text-zinc-400">Cotización #:</span>
+                                     <span className="font-medium">{quoteNumber}</span>
+                                 </div>
+                                 <div className="flex justify-between gap-8">
+                                     <span className="text-zinc-400">Válido hasta:</span>
+                                     <span className="font-medium">{validUntil}</span>
+                                 </div>
+                             </div>
+                         </div>
+
+                        {/* 3. Items Table */}
+                         <div className="p-8 min-h-[400px]">
+                             <table className="w-full text-sm">
+                                 <thead>
+                                     <tr className="border-b border-black/10 text-left">
+                                         <th className="py-3 font-semibold w-12 text-center">#</th>
+                                         <th className="py-3 font-semibold">Descripción</th>
+                                         <th className="py-3 font-semibold w-24 text-center">Cant.</th>
+                                         <th className="py-3 font-semibold w-32 text-right">Precio</th>
+                                         <th className="py-3 font-semibold w-32 text-right">Total</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody className="divide-y divide-zinc-100">
+                                     {items.map((item, i) => (
+                                         <tr key={item.id}>
+                                             <td className="py-4 text-center text-zinc-400">{i + 1}</td>
+                                             <td className="py-4 font-medium">{item.name || 'Descripción del servicio...'}</td>
+                                             <td className="py-4 text-center text-zinc-500">{item.quantity}</td>
+                                             <td className="py-4 text-right text-zinc-500">${item.price.toFixed(2)}</td>
+                                             <td className="py-4 text-right font-semibold">${(item.price * item.quantity).toFixed(2)}</td>
+                                         </tr>
+                                     ))}
+                                 </tbody>
+                             </table>
+                         </div>
+
+                        {/* 4. Footer / Totals */}
+                         <div className="mt-auto bg-zinc-50 p-8 border-t border-zinc-100">
+                             <div className="flex justify-between items-start">
+                                 <div className="w-1/2 space-y-6">
+                                     {bankDetails.bank && paymentMethod === 'bank' && (
+                                         <div>
+                                             <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-400 mb-2">Información de Pago</h4>
+                                             <div className="text-xs space-y-1 text-zinc-600">
+                                                 <p><span className="font-semibold text-black">Banco:</span> {bankDetails.bank}</p>
+                                                 <p><span className="font-semibold text-black">Cuenta:</span> {bankDetails.account}</p>
+                                                 <p><span className="font-semibold text-black">CLABE:</span> {bankDetails.clabe}</p>
+                                                 <p><span className="font-semibold text-black">Titular:</span> {bankDetails.holder}</p>
+                                             </div>
+                                         </div>
+                                     )}
+                                     {paymentMethod === 'link' && paymentLink && (
+                                          <div>
+                                             <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-400 mb-2">Pago en Línea</h4>
+                                             <div className="text-xs text-zinc-600">
+                                                <p className="mb-1">Realiza tu pago seguro aquí:</p>
+                                                <a href={paymentLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline truncate block">{paymentLink}</a>
+                                             </div>
+                                          </div>
+                                     )}
+
+                                     {notes && (
+                                         <div className="pt-4">
+                                             <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-400 mb-2">Notas</h4>
+                                             <p className="text-xs text-zinc-500 whitespace-pre-wrap">{notes}</p>
+                                         </div>
+                                     )}
+                                 </div>
+
+                                 <div className="w-80 space-y-3">
+                                     <div className="flex justify-between text-sm">
+                                         <span className="text-zinc-500">Subtotal</span>
+                                         <span className="font-medium">${subtotal.toFixed(2)} {currency}</span>
+                                     </div>
+                                     {includeIva && (
+                                         <div className="flex justify-between text-sm">
+                                             <span className="text-zinc-500">IVA ({ivaPercentage}%)</span>
+                                             <span className="font-medium">${taxAmount.toFixed(2)} {currency}</span>
+                                         </div>
+                                     )}
+                                     <div className="flex justify-between text-lg font-bold border-t border-black/10 pt-3 mt-2">
+                                         <span>Total</span>
+                                         <span>${total.toFixed(2)} {currency}</span>
+                                     </div>
+                                     
+                                     {/* Signature Area */}
+                                     {signatureMode !== 'none' && (
+                                         <div className="mt-8 pt-8 border-t border-zinc-200 text-center">
+                                             {signatureMode === 'image' && signatureImage ? (
+                                                 <img src={signatureImage} alt="Firma" className="h-12 mx-auto mb-2 object-contain" />
+                                             ) : signatureMode === 'text' && signatureText ? (
+                                                  <div className="font-script text-xl mb-2">{signatureText}</div>
+                                             ) : null}
+                                             <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Firma Autorizada</p>
+                                         </div>
+                                     )}
+                                 </div>
+                             </div>
+                             
+                             {/* Footer Branding */}
+                             <div className="mt-12 pt-6 border-t border-zinc-200 flex justify-between items-center text-[10px] text-zinc-400 uppercase tracking-widest">
+                                 <span>{senderWebsite}</span>
+                                 <span>Gracias por su preferencia</span>
+                             </div>
+                         </div>
+                    </div>
+                  </div>
+             </main>
+
+             {/* RIGHT SIDEBAR - CONFIGURATION */}
+             <aside className="w-80 bg-white border-l border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0">
                  <div className="p-4 border-b border-zinc-100">
                     <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Configuración</h2>
                  </div>
                  
                  <div className="p-4 space-y-6 pb-20">
-                         {/* SENDER DETAILS TOGGLE */}
-                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                        <button 
-                            onClick={() => setShowSenderConfig(!showSenderConfig)}
-                            className="flex justify-between items-center w-full text-xs font-semibold mb-0"
-                        >
-                            <span>Datos del Remitente</span>
-                            <span className="text-[10px] text-zinc-500">{showSenderConfig ? 'Ocultar' : 'Editar'}</span>
-                        </button>
-                        
-                        {showSenderConfig && (
-                            <div className="mt-3 space-y-2 border-t border-zinc-200 pt-3 animate-fadeIn">
-                                <input type="text" placeholder="Tu Nombre / Empresa" value={senderName} onChange={(e) => setSenderName(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
-                                <input type="text" placeholder="Rol / Slogan" value={senderRole} onChange={(e) => setSenderRole(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
-                                <input type="text" placeholder="Email de contacto" value={senderEmail} onChange={(e) => setSenderEmail(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
-                                <input type="text" placeholder="Sitio Web (Footer)" value={senderWebsite} onChange={(e) => setSenderWebsite(e.target.value)} className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors" />
-                            </div>
-                        )}
-                     </div>
-
                      {/* DESIGN CUSTOMIZATION TOGGLE */}
                      <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                        <button 
-                            onClick={() => setShowDesignConfig(!showDesignConfig)}
-                            className="flex justify-between items-center w-full text-xs font-semibold mb-0"
-                        >
-                            <span>Personalización y Diseño</span>
-                            <span className="text-[10px] text-zinc-500">{showDesignConfig ? 'Ocultar' : 'Editar'}</span>
-                        </button>
+                        <h3 className="text-xs font-semibold mb-3">Personalización y Diseño</h3>
                         
-                        {showDesignConfig && (
-                            <div className="mt-3 space-y-4 border-t border-zinc-200 pt-3 animate-fadeIn">
+                            <div className="space-y-4">
                                 
                                 {/* Logo Config */}
                                 <div className="bg-white p-2 rounded-lg border border-zinc-200">
@@ -578,160 +1009,7 @@ Generated by ${senderWebsite}
                                 )}
 
                             </div>
-                        )}
                      </div>
-
-                    {/* CLIENT DETAILS */}
-                    <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                      <h2 className="text-xs font-semibold mb-3">Detalles del Cliente</h2>
-                      <div className="space-y-2">
-                         <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">No. Cotización</label>
-                                <input
-                                    type="text"
-                                    value={quoteNumber}
-                                    onChange={(e) => setQuoteNumber(e.target.value)}
-                                    className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">Fecha</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                                />
-                            </div>
-                         </div>
-                        <div>
-                          <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">Nombre / Empresa</label>
-                          <input
-                            type="text"
-                            value={clientName}
-                            onChange={(e) => setClientName(e.target.value)}
-                            className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                            placeholder="Cliente"
-                          />
-                        </div>
-                        <div>
-                           <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">Dirección</label>
-                           <input
-                            type="text"
-                            value={clientAddress}
-                            onChange={(e) => setClientAddress(e.target.value)}
-                            className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                            placeholder="Calle, Ciudad, CP"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                            <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">Email</label>
-                            <input
-                                type="email"
-                                value={clientEmail}
-                                onChange={(e) => setClientEmail(e.target.value)}
-                                className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                            />
-                            </div>
-                            <div>
-                            <label className="block text-zinc-500 text-[9px] mb-0.5 uppercase tracking-wide font-medium">Teléfono</label>
-                            <input
-                                type="tel"
-                                value={clientPhone}
-                                onChange={(e) => setClientPhone(e.target.value)}
-                                className="w-full bg-white border border-zinc-200 rounded-lg p-1.5 text-xs focus:border-black outline-none transition-colors"
-                            />
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* SERVICES */}
-                    <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-                      <div className="flex justify-between items-center mb-3">
-                         <h2 className="text-xs font-semibold">Servicios</h2>
-                         <div className="flex items-center gap-2">
-                             <label className="flex items-center gap-1 text-[9px] cursor-pointer">
-                                <input 
-                                    type="checkbox" 
-                                    checked={includeIva} 
-                                    onChange={(e) => setIncludeIva(e.target.checked)}
-                                    className="accent-black h-3 w-3"
-                                />
-                                IVA
-                             </label>
-                         </div>
-                      </div>
-                      
-                      {includeIva && (
-                         <div className="flex gap-1 mb-3 bg-white p-1 rounded-lg border border-zinc-100">
-                             <input 
-                                type="number" 
-                                value={ivaPercentage} 
-                                onChange={(e) => setIvaPercentage(Number(e.target.value))}
-                                className="w-10 bg-zinc-50 border border-zinc-200 rounded px-1 text-[10px] text-center"
-                            />
-                            <div className="flex-1 flex gap-1">
-                                <button onClick={() => setIvaMode('add')} className={`flex-1 text-[9px] rounded ${ivaMode === 'add' ? 'bg-black text-white' : 'text-zinc-500'}`}>+IVA</button>
-                                <button onClick={() => setIvaMode('inclusive')} className={`flex-1 text-[9px] rounded ${ivaMode === 'inclusive' ? 'bg-black text-white' : 'text-zinc-500'}`}>Incluido</button>
-                            </div>
-                         </div>
-                      )}
-
-                      <div className="space-y-2">
-                        {items.map((item, index) => (
-                          <div key={item.id} className="flex gap-1 items-start">
-                            <div className="flex-1 grid grid-cols-12 gap-1">
-                                 <input
-                                  type="text"
-                                  placeholder="Servicio"
-                                  value={item.name}
-                                  onChange={(e) => updateItem(item.id, 'name', e.target.value)}
-                                  className="col-span-12 bg-white border border-zinc-200 rounded p-1.5 text-[10px] focus:border-black outline-none transition-colors"
-                                />
-                                 <input
-                                  type="number"
-                                  placeholder="Cant"
-                                  value={item.quantity}
-                                  onChange={(e) => updateItem(item.id, 'quantity', e.target.value)}
-                                  className="col-span-3 bg-white border border-zinc-200 rounded p-1.5 text-[10px] focus:border-black outline-none transition-colors text-center"
-                                />
-                                 <input
-                                  type="number"
-                                  placeholder="Precio"
-                                  value={item.price}
-                                  onChange={(e) => updateItem(item.id, 'price', e.target.value)}
-                                  className="col-span-4 bg-white border border-zinc-200 rounded p-1.5 text-[10px] focus:border-black outline-none transition-colors text-right"
-                                />
-                                <div className="col-span-5 text-[10px] flex items-center justify-end font-medium text-zinc-500">
-                                    ${(item.price * item.quantity).toFixed(0)}
-                                </div>
-                            </div>
-                           
-                            <button 
-                              onClick={() => removeItem(item.id)}
-                              className="text-zinc-400 hover:text-red-500 p-1"
-                            >
-                              x
-                            </button>
-                          </div>
-                        ))}
-                        
-                        <div className="flex justify-between items-center text-xs font-bold pt-2 border-t border-zinc-200 px-1">
-                            <span>Total Estimado:</span>
-                            <span>${total.toFixed(2)}</span>
-                        </div>
-
-                        <button
-                          onClick={addItem}
-                          className="w-full bg-zinc-800 text-white text-[10px] hover:bg-black py-2 rounded-lg transition-colors mt-2"
-                        >
-                          + Agregar Item
-                        </button>
-                      </div>
-                    </div>
 
                     {/* NOTES */}
                     <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
@@ -773,246 +1051,6 @@ Generated by ${senderWebsite}
                      </div>
                  </div>
              </aside>
-
-             {/* MAIN CONTENT - PREVIEW */}
-             <main className="flex-1 bg-zinc-100/50 relative overflow-auto flex justify-center p-8 lg:p-12 print:p-0 print:bg-white print:block">
-                  <div className="scale-100 origin-top transition-transform duration-200">
-                     {/* Dynamic Page Layout */}
-                    <div 
-                        id="quote-preview"
-                        className="shadow-2xl mx-auto print:shadow-none print:w-full print:max-w-none print:min-h-0 relative flex flex-col font-inter transition-all duration-300 ease-in-out bg-white"
-                        style={{ 
-                            WebkitPrintColorAdjust: 'exact', 
-                            printColorAdjust: 'exact',
-                            width: PAGE_SIZES[pageSize].width,
-                            height: PAGE_SIZES[pageSize].height,
-                            overflow: 'hidden',
-                            backgroundColor: bodyBg,
-                            color: bodyText
-                        }}
-                    >
-                        
-                        {/* 1. Header Dark - Compact with Forced Print Color */}
-                        <div 
-                            className="p-8 pr-12 h-36 flex justify-between items-start relative overflow-hidden transition-colors"
-                            style={{ 
-                                WebkitPrintColorAdjust: 'exact', 
-                                printColorAdjust: 'exact', 
-                                backgroundColor: headerBg,
-                                color: headerText
-                            }}
-                        >
-                            <div className="z-10">
-                                <h1 className="text-4xl font-light tracking-wide mb-1 leading-none capitalize" style={{ color: headerText }}>{senderName}</h1>
-                                <p className="text-xs tracking-[0.2em] font-light uppercase opacity-80" style={{ color: headerText }}>{senderRole}</p>
-                            </div>
-                            {/* Decorative Logo or Asterisk */}
-                            <div className="opacity-90 leading-none select-none">
-                                {includeLogo && (
-                                    logoImage ? (
-                                        <img src={logoImage} alt="Logo" className="h-16 w-16 object-contain" />
-                                    ) : (
-                                        <span className="text-[60px]" style={{ fontFamily: 'monospace', color: headerText }}>*</span>
-                                    )
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="p-8 pb-4 pt-6 flex-1 relative flex flex-col">
-                             {/* 2. Top Info Row - Compact */}
-                             <div className="flex justify-between items-end mb-8">
-                                 <div className="text-xs font-medium opacity-70">
-                                    Fecha: {getFormattedDate(date)}
-                                 </div>
-                                 <div className="text-right max-w-sm">
-                                     <h2 className="text-3xl font-normal mb-1 opacity-90">Cotización</h2>
-                                     <p className="text-[9px] leading-relaxed opacity-60 text-justify">
-                                        {notes && notes.length > 0 ? (notes.length > 150 ? notes.slice(0, 150) + '...' : notes) : 'Gracias.'}
-                                     </p>
-                                 </div>
-                             </div>
-
-
-                             {/* 3. Grid Layout: Left Sidebar + Main Content */}
-                             <div className="grid grid-cols-12 gap-6 flex-1">
-                                 
-                                 {/* LEFT SIDEBAR (Client Info) */}
-                                 <div className="col-span-4 space-y-6 border-r border-zinc-200/0 pr-4"> 
-                                    
-                                    {/* CLIENTE */}
-                                    <div>
-                                        <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-50 mb-2">Cliente</h3>
-                                        <p className="font-semibold text-xs mb-1 opacity-90">{clientName || 'Nombre del Cliente'}</p>
-                                        <div className="text-[10px] opacity-60 space-y-0.5">
-                                            {clientAddress && <p>{clientAddress}</p>}
-                                            {clientPhone && <p>{clientPhone}</p>}
-                                            {clientEmail && <p>{clientEmail}</p>}
-                                        </div>
-                                    </div>
-
-                                    {/* FOLIO */}
-                                    <div>
-                                        <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-50 mb-1">Folio</h3>
-                                        <p className="text-xs font-medium opacity-90">{quoteNumber}</p>
-                                    </div>
-
-                                    {/* PAYMENT METHOD */}
-                                    <div className="pt-8">
-                                        <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-90 mb-2">Método de Pago:</h3>
-                                        {paymentMethod === 'bank' ? (
-                                            <div className="text-[10px] opacity-60 space-y-1">
-                                                <p>Banco: {bankDetails.bank}</p>
-                                                <p>Cuenta: {bankDetails.account}</p>
-                                                <p>CLABE: {bankDetails.clabe}</p>
-                                                <p>Titular: {bankDetails.holder}</p>
-                                            </div>
-                                        ) : (
-                                            <div className="text-[10px] opacity-60 space-y-1">
-                                                <p className="mb-2">Pagar en línea:</p>
-                                                <a href={paymentLink} target="_blank" className="inline-flex items-center justify-center px-4 py-2 rounded text-[10px] font-medium tracking-wide transition-colors" style={{ backgroundColor: headerBg, color: headerText }}>
-                                                    PAGAR AQUÍ
-                                                </a>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* CONTACT */}
-                                    <div className="pt-4">
-                                        <h3 className="text-[9px] font-bold uppercase tracking-wider opacity-90 mb-2">Contáctanos:</h3>
-                                        <div className="text-[10px] opacity-60 space-y-1">
-                                            <p>{senderEmail}</p>
-                                            <p>{senderWebsite}</p>
-                                        </div>
-                                    </div>
-
-                                 </div>
-
-
-                                 {/* RIGHT MAIN CONTENT (Table) */}
-                                 <div className="col-span-8 flex flex-col">
-                                     {/* Project Title */}
-                                     <div className="flex justify-between items-baseline border-b border-zinc-300/30 pb-2 mb-4">
-                                        <div className="flex gap-2 text-[9px] font-bold uppercase tracking-wider opacity-90">
-                                            <span>Proyecto:</span>
-                                            <span className="opacity-60">{packageName || 'GENERAL'}</span>
-                                        </div>
-                                        <div className="text-[9px] font-bold uppercase tracking-wider opacity-90">
-                                            Factura No. {quoteNumber}
-                                        </div>
-                                     </div>
-
-                                     {/* Table Header */}
-                                     <div className="grid grid-cols-12 gap-2 mb-2 text-[9px] font-bold uppercase tracking-wider opacity-60">
-                                         <div className="col-span-1 text-center">No</div>
-                                         <div className="col-span-5">Descripción</div>
-                                         <div className="col-span-2 text-right">Precio</div>
-                                         <div className="col-span-2 text-center">Cant.</div>
-                                         <div className="col-span-2 text-center">Total</div>
-                                     </div>
-
-                                     {/* Items */}
-                                     <div className="space-y-2 mb-auto min-h-[50px]">
-                                        {items.map((item, index) => (
-                                            <div key={item.id} className="grid grid-cols-12 gap-2 text-[11px] items-center group relative py-1">
-                                                {/* Highlight Bar for Total - Absolute Background */}
-                                                <div 
-                                                    className="absolute right-0 top-[-2px] bottom-[-2px] w-[16.666%] -z-10 opacity-100 group-hover:opacity-90"
-                                                    style={{ backgroundColor: highlightBg, color: highlightText }} 
-                                                ></div>
-
-                                                <div className="col-span-1 text-center opacity-50 font-light">{index + 1}</div>
-                                                <div className="col-span-11 sm:col-span-5 opacity-90 font-medium pr-2 leading-tight">
-                                                    {item.name || 'Servicio'}
-                                                </div>
-                                                <div className="hidden sm:block sm:col-span-2 text-right opacity-70">
-                                                    ${Number(item.price).toFixed(2)}
-                                                </div>
-                                                <div className="hidden sm:block sm:col-span-2 text-center opacity-70 font-light">
-                                                    {item.quantity}
-                                                </div>
-                                                <div className="col-span-12 sm:col-span-2 text-center font-medium z-10 px-2" style={{ color: highlightText }}>
-                                                    ${(item.price * item.quantity).toFixed(2)}
-                                                </div>
-                                            </div>
-                                        ))}
-                                     </div>
-
-                                     {/* Totals Section */}
-                                     <div className="grid grid-cols-12 gap-2 mt-4 pt-4 border-t border-zinc-300/30">
-                                         <div className="col-span-6">
-                                             <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-90 mb-1">Total a Pagar:</h3>
-                                             <p className="text-xl font-bold opacity-100">${total.toFixed(2)} {currency}</p>
-                                         </div>
-                                         <div className="col-span-6 space-y-1">
-                                             {/* Math Breakdown */}
-                                             {((includeIva && ivaMode === 'add') || (!includeIva)) && (
-                                                 <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
-                                                     <span>Subtotal</span>
-                                                     <span>${subtotal.toFixed(2)}</span>
-                                                 </div>
-                                             )}
-
-                                             { /* Special Case: Inclusive taxes, show Raw Sum first? */ }
-                                             {includeIva && ivaMode === 'inclusive' && (
-                                                  <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
-                                                     <span>Importe (Iva Incluido)</span>
-                                                     <span>${total.toFixed(2)}</span>
-                                                  </div>
-                                             )}
-
-                                             {includeIva && (
-                                                 <>
-                                                    {ivaMode === 'inclusive' && (
-                                                        <div className="flex justify-between text-[9px] opacity-60 uppercase tracking-wider pl-2 border-l-2 border-zinc-200/50">
-                                                            <span>Subtotal Neto</span>
-                                                            <span>${subtotal.toFixed(2)}</span>
-                                                        </div>
-                                                    )}
-                                                    <div className="flex justify-between text-[10px] opacity-70 font-bold uppercase tracking-wider">
-                                                        <span>IVA ({ivaPercentage}%)</span>
-                                                        <span>${taxAmount.toFixed(2)}</span>
-                                                    </div>
-                                                 </>
-                                             )}
-
-                                             <div className="flex justify-between text-sm opacity-100 font-bold uppercase tracking-wider mt-2 pt-1 border-t border-zinc-300/30">
-                                                 <span>Total</span>
-                                                 <span>${total.toFixed(2)}</span>
-                                             </div>
-                                         </div>
-                                     </div>
-
-                                     {/* Approved By */}
-                                     {signatureMode !== 'none' && (
-                                         <div className="mt-12 text-right">
-                                             <p className="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-6">Aprobado Por</p>
-                                             <div className="inline-block relative">
-                                                 {/* Signature Content */}
-                                                 <div className="h-16 w-32 mx-auto border-b border-zinc-800/30 mb-2 flex items-end justify-center">
-                                                  {signatureMode === 'image' && signatureImage && (
-                                                     <img src={signatureImage} alt={`Firma ${senderName}`} className="h-full object-contain pb-1 opacity-80" />
-                                                  )}
-                                                  {signatureMode === 'text' && signatureText && (
-                                                     <span className="font-cursive text-lg opacity-80 pb-1" style={{ fontFamily: 'cursive' }}>{signatureText}</span>
-                                                  )}
-                                                 </div>
-                                                 <p className="font-bold text-xs opacity-90 uppercase">{senderName}</p>
-                                                 <p className="text-[9px] opacity-60">@{senderWebsite}</p>
-                                             </div>
-                                         </div>
-                                     )}
-
-                                 </div>
-                             </div>
-                        </div>
-
-                        {/* Print Margin Fix / URL Branding */}
-                        <div className="hidden print:block absolute bottom-4 left-0 w-full text-center text-[8px] opacity-30">
-                            {senderWebsite}
-                        </div>
-                    </div>
-                  </div>
-             </main>
         </div>
     </div>
   );
