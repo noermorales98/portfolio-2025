@@ -117,6 +117,12 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
     setHighlightText(DEFAULTS.highlightText);
   };
 
+  // Quote Number State - initialize empty to avoid hydration mismatch
+  const [quoteNumber, setQuoteNumber] = useState(initialData.quoteNumber || '');
+  
+  // Mobile desktop notice popup state
+  const [showDesktopNotice, setShowDesktopNotice] = useState(false);
+
   const hasCustomColors = headerBg !== DEFAULTS.headerBg || 
                           headerText !== DEFAULTS.headerText || 
                           bodyBg !== DEFAULTS.bodyBg || 
@@ -137,9 +143,8 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
   // Core Info
   const [clientName, setClientName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [packageName, setPackageName] = useState('');
+  const [packageName, setPackageName] = useState(initialData.packageName || 'General');
 
-  const [quoteNumber, setQuoteNumber] = useState('');
   const [validUntil, setValidUntil] = useState('30 días');
 
   // New Fields
@@ -149,16 +154,16 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
   const [clientPhone, setClientPhone] = useState('');
   const [notes, setNotes] = useState(initialData.defaultNotes || 'Condiciones del servicio, tiempos de entrega y detalles de pago.');
 
-  // --- Items & Totals State ---
-  const [items, setItems] = useState(initialData.items || [
-    { id: 1, name: 'Servicio Ejemplo', quantity: 1, price: 1000 }
-  ]);
+  // --- Items State ---
+  const [items, setItems] = useState(initialData.items || [{ id: 1, name: '', quantity: 1, price: 0 }]);
+  const [nextItemId, setNextItemId] = useState(initialData.items ? Math.max(...initialData.items.map(item => item.id)) + 1 : 2);
   const [includeIva, setIncludeIva] = useState(false);
   const [ivaPercentage, setIvaPercentage] = useState(16);
   const [ivaMode, setIvaMode] = useState('add'); // 'add' (sumar) or 'inclusive' (desglosar)
 
   // Page Size State
   const [pageSize, setPageSize] = useState('letter');
+  const [activeMobileTab, setActiveMobileTab] = useState('preview'); // 'data', 'preview', 'config'
   
   const PAGE_SIZES = {
     letter: { name: 'Carta (Letter)', css: '8.5in 11in', width: '215.9mm', height: '279.4mm' },
@@ -188,6 +193,9 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
 
   const startPan = (event) => {
     if (event.button !== 0) return;
+    // Ignore touch events in pointer handler to avoid conflict with dedicated touch handlers
+    if (event.pointerType === 'touch') return;
+    
     const container = event.currentTarget;
     if (!container) return;
 
@@ -231,27 +239,75 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
     }
   };
 
+  // --- Panning (Desktop only) ---
+
+  const centerContent = () => {
+      const container = previewScrollRef.current;
+      if (!container) return;
+
+      // Verify that we actually have scrollable content
+      const hasScrollableContent = container.scrollWidth > container.clientWidth || 
+                                    container.scrollHeight > container.clientHeight;
+      
+      if (!hasScrollableContent) {
+          // Content might still be loading, try again
+          return false;
+      }
+
+      // Center the scroll view (the infinite canvas creates scrollable area)
+      const scrollX = (container.scrollWidth - container.clientWidth) / 2;
+      const scrollY = (container.scrollHeight - container.clientHeight) / 2;
+      
+      container.scrollTo({ top: scrollY, left: scrollX, behavior: 'smooth' });
+      return true;
+  };
+
+  const centerContentWithRetry = (maxAttempts = 5, attempt = 0) => {
+      if (attempt >= maxAttempts) return;
+      
+      requestAnimationFrame(() => {
+          const success = centerContent();
+          if (!success && attempt < maxAttempts - 1) {
+              // If centering failed (no scrollable content yet), retry after a short delay
+              setTimeout(() => centerContentWithRetry(maxAttempts, attempt + 1), 100);
+          }
+      });
+  };
+
+  const handleResetZoom = () => {
+      calculateDefaultZoom();
+      // Use retry logic for reset zoom
+      setTimeout(() => centerContentWithRetry(), 100);
+  };
+
   const calculateDefaultZoom = () => {
-    // We want to fit the page in the available main area with some padding
-    // Assuming sidebars are roughly 320px each and some padding in main
     const mainArea = document.querySelector('main');
     if (!mainArea) return;
 
-    const padding = 64; // Horizontal padding (32px each side)
-    const topPadding = 48; // Vertical padding
+    // Check if we're on mobile
+    const isMobile = window.innerWidth < 1024;
     
-    const availableWidth = mainArea.clientWidth - padding;
-    const availableHeight = mainArea.clientHeight - topPadding;
-    
-    // Convert current page size to pixels (approx 96 DPI)
-    const { width: pageWidthPx, height: pageHeightPx } = getPageSizePx(pageSize);
-
-    const scaleX = availableWidth / pageWidthPx;
-    const scaleY = availableHeight / pageHeightPx;
-    
-    // Choose the smaller scale to ensure it fits both ways, and cap at 1.0 or custom
-    const fitScale = Math.min(scaleX, scaleY, 1) * 0.95; // 0.95 for a bit of extra breathing room
-    setZoom(fitScale);
+    if (isMobile) {
+      // On mobile: fit to width only, allow vertical scrolling
+      const availableWidth = mainArea.clientWidth - 32; // Small padding
+      const { width: pageWidthPx } = getPageSizePx(pageSize);
+      const fitScale = (availableWidth / pageWidthPx) * 0.98;
+      setZoom(fitScale);
+    } else {
+      // On desktop: fit both width and height with padding
+      const padding = 64;
+      const topPadding = 48;
+      
+      const availableWidth = mainArea.clientWidth - padding;
+      const availableHeight = mainArea.clientHeight - topPadding;
+      
+      const { width: pageWidthPx, height: pageHeightPx } = getPageSizePx(pageSize);
+      const scaleX = availableWidth / pageWidthPx;
+      const scaleY = availableHeight / pageHeightPx;
+      
+      const fitScale = Math.min(scaleX, scaleY, 1) * 0.95;
+      setZoom(fitScale);
+    }
   };
 
   // Recalculate zoom on mount, resize, or page size change
@@ -260,6 +316,14 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
     window.addEventListener('resize', calculateDefaultZoom);
     return () => window.removeEventListener('resize', calculateDefaultZoom);
   }, [pageSize]);
+
+  // Center content on desktop only (not needed on mobile with width-fit)
+  useEffect(() => {
+    const isMobile = window.innerWidth < 1024;
+    if (!isMobile) {
+      centerContentWithRetry();
+    }
+  }, [zoom, activeMobileTab]);
 
   useLayoutEffect(() => {
     const container = previewScrollRef.current;
@@ -328,6 +392,7 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
         if (parsed.notes) setNotes(parsed.notes);
         
         if (parsed.items) setItems(parsed.items);
+        if (parsed.nextItemId) setNextItemId(parsed.nextItemId);
         if (parsed.includeIva !== undefined) setIncludeIva(parsed.includeIva);
         if (parsed.ivaPercentage) setIvaPercentage(parsed.ivaPercentage);
         if (parsed.ivaMode) setIvaMode(parsed.ivaMode);
@@ -336,8 +401,20 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
       } catch (e) {
         console.error('Error loading data', e);
       }
-    } else {
-         setQuoteNumber(Date.now().toString().slice(-6));
+    }
+    
+    // Set quote number after mount to avoid hydration mismatch
+    if (!initialData.quoteNumber && !quoteNumber) {
+      setQuoteNumber(Date.now().toString().slice(-6));
+    }
+    
+    // Check if we should show desktop notice on mobile
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 1024;
+      const hasSeenNotice = localStorage.getItem('hasSeenDesktopNotice');
+      if (isMobile && !hasSeenNotice) {
+        setShowDesktopNotice(true);
+      }
     }
   }, []);
 
@@ -350,7 +427,7 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
         paymentMethod, paymentLink, bankDetails,
         clientName, date, packageName, quoteNumber, validUntil,
         currency, clientAddress, clientEmail, clientPhone, notes,
-        items, includeIva, ivaPercentage, ivaMode, pageSize
+        items, nextItemId, includeIva, ivaPercentage, ivaMode, pageSize
     };
     // Debounce slightly to avoid excessive writes
     const timeoutId = setTimeout(() => {
@@ -364,12 +441,13 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
     paymentMethod, paymentLink, bankDetails,
     clientName, date, packageName, quoteNumber, validUntil,
     currency, clientAddress, clientEmail, clientPhone, notes,
-    items, includeIva, ivaPercentage, ivaMode, pageSize
+    items, nextItemId, includeIva, ivaPercentage, ivaMode, pageSize
   ]);
 
   // --- Helpers ---
   const addItem = () => {
-    setItems([...items, { id: Date.now(), name: '', quantity: 1, price: 0 }]);
+    setItems([...items, { id: nextItemId, name: '', quantity: 1, price: 0 }]);
+    setNextItemId(nextItemId + 1);
   };
 
   const removeItem = (id) => {
@@ -432,6 +510,11 @@ export default function QuoteDashboard({ onLogout, initialData = {} }) {
 
   const handlePrint = () => {
     window.print();
+  };
+  
+  const handleDismissNotice = () => {
+    setShowDesktopNotice(false);
+    localStorage.setItem('hasSeenDesktopNotice', 'true');
   };
 
   const getFormattedDate = (dateStr) => {
@@ -519,7 +602,51 @@ Generated by ${senderWebsite}
   const scaledPageHeight = pageHeightPx * zoom;
 
   return (
-    <div className="h-screen flex flex-col bg-zinc-50 text-black font-inter overflow-hidden">
+    <>
+      {/* Desktop Notice Popup for Mobile */}
+      {showDesktopNotice && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 print-hidden">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={handleDismissNotice}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              {/* Icon */}
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+              
+              {/* Title */}
+              <h3 className="text-lg font-bold text-zinc-900">
+                Mejor experiencia en escritorio
+              </h3>
+              
+              {/* Message */}
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                La versión de escritorio ofrece más opciones y está mejor optimizada para crear y editar cotizaciones.
+              </p>
+              
+              {/* Button */}
+              <button
+                onClick={handleDismissNotice}
+                className="w-full bg-black text-white font-medium py-3 px-6 rounded-lg hover:bg-zinc-800 active:scale-95 transition-all"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="h-screen flex flex-col bg-zinc-50 text-black font-inter overflow-hidden">
         {/* Dynamic Styles for Print */}
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
@@ -540,24 +667,24 @@ Generated by ${senderWebsite}
         <nav className="h-16 bg-white border-b border-zinc-200 flex items-center justify-between px-4 z-50 print-hidden flex-shrink-0">
              {/* Left: Branding & Project Name */}
              <div className="flex items-center gap-4">
-                 <div className="flex items-center gap-2">
+                 <div className="hidden lg:flex items-center gap-2">
                     <div className="h-8 w-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-xs">
                         QT
                     </div>
                 </div>
-                <div className="h-6 w-px bg-zinc-200 mx-2"></div>
+                <div className="hidden lg:block h-6 w-px bg-zinc-200 mx-2"></div>
                 <input
                     type="text"
                     value={packageName}
                     onChange={(e) => setPackageName(e.target.value)}
                     placeholder="Nombre del Proyecto"
-                    className="bg-transparent text-sm font-semibold text-zinc-900 placeholder-zinc-400 focus:outline-none focus:bg-zinc-50 hover:bg-zinc-50 px-2 py-1 rounded transition-colors w-64"
+                    className="hidden lg:block bg-transparent text-sm font-semibold text-zinc-900 placeholder-zinc-400 focus:outline-none focus:bg-zinc-50 hover:bg-zinc-50 px-2 py-1 rounded transition-colors w-full lg:w-64"
                 />
              </div>
 
              {/* Center: Page Controls */}
              <div className="flex items-center gap-2 bg-zinc-100 p-1 rounded-lg border border-zinc-200/50">
-                  <div className="flex items-center gap-2 px-2 border-r border-zinc-200">
+                  <div className="hidden lg:flex items-center gap-2 px-2 border-r border-zinc-200">
                       <span className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider">Tamaño</span>
                       <select 
                         value={pageSize}
@@ -580,7 +707,7 @@ Generated by ${senderWebsite}
                       />
                   </div>
 
-                  <div className="flex items-center gap-1 px-2">
+                  <div className="hidden lg:flex items-center gap-1 px-2">
                        <button 
                          onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}
                          className="p-1 hover:bg-zinc-200 rounded text-zinc-600 transition-colors"
@@ -589,9 +716,9 @@ Generated by ${senderWebsite}
                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                        </button>
                        <button 
-                         onClick={calculateDefaultZoom}
+                         onClick={handleResetZoom}
                          className="px-1.5 py-0.5 hover:bg-zinc-200 rounded text-[10px] font-bold text-zinc-700 transition-colors min-w-[40px]"
-                         title="Ajustar"
+                         title="Ajustar y Centrar"
                        >
                          {Math.round(zoom * 100)}%
                        </button>
@@ -609,7 +736,7 @@ Generated by ${senderWebsite}
              <div className="flex items-center gap-3">
                  <button 
                     onClick={handlePrint}
-                    className="text-zinc-600 hover:text-black hover:bg-zinc-100 p-2 rounded-lg transition-all"
+                    className="hidden lg:block text-zinc-600 hover:text-black hover:bg-zinc-100 p-2 rounded-lg transition-all"
                     title="Imprimir"
                  >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -630,10 +757,10 @@ Generated by ${senderWebsite}
         </nav>
 
         {/* 2. EDITOR WORKSPACE */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
              
              {/* LEFT SIDEBAR - SENDER, CLIENT, SERVICES */}
-             <aside className="w-80 bg-white border-r border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0">
+             <aside className={`w-full lg:w-80 bg-white border-r border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0 absolute inset-0 lg:relative lg:inset-auto ${activeMobileTab === 'data' ? 'block' : 'hidden lg:block'}`}>
                  <div className="p-4 border-b border-zinc-100">
                     <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Datos y Servicios</h2>
                  </div>
@@ -788,9 +915,13 @@ Generated by ${senderWebsite}
                 onPointerUp={endPan}
                 onPointerCancel={endPan}
                 onPointerLeave={endPan}
-                className={`flex-1 bg-zinc-100/50 relative overflow-auto ${zoom > 1 ? 'px-0 py-8 lg:py-12' : 'p-8 lg:p-12'} print:p-0 print:bg-white print:block cursor-grab ${isPanning ? 'cursor-grabbing select-none' : ''}`}
+
+                className={`flex-1 bg-zinc-100/50 relative overflow-auto print:p-0 print:bg-white print:block cursor-grab ${isPanning ? 'cursor-grabbing select-none' : ''} ${activeMobileTab === 'preview' ? 'block' : 'hidden lg:block'}`}
               >
-                  <div className={`flex items-start min-w-full ${zoom > 1 ? 'justify-start' : 'justify-center'}`}>
+                  {/* Simple container with normal scrolling on mobile, infinite canvas on desktop */}
+                  <div 
+                    className={`flex items-center justify-center min-w-full min-h-full p-4 lg:p-[50vmin]`}
+                  >
                     {zoom > 1 && <div className="shrink-0 w-8 lg:w-12" aria-hidden="true" />}
                     <div
                       ref={pageWrapperRef}
@@ -986,7 +1117,7 @@ Generated by ${senderWebsite}
             </main>
 
              {/* RIGHT SIDEBAR - CONFIGURATION */}
-             <aside className="w-80 bg-white border-l border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0">
+             <aside className={`w-full lg:w-80 bg-white border-l border-zinc-200 overflow-y-auto z-20 shadow-sm print-hidden flex flex-col flex-shrink-0 absolute inset-0 lg:relative lg:inset-auto ${activeMobileTab === 'config' ? 'block' : 'hidden lg:block'}`}>
                  <div className="p-4 border-b border-zinc-100">
                     <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Configuración</h2>
                  </div>
@@ -1173,6 +1304,34 @@ Generated by ${senderWebsite}
                  </div>
              </aside>
         </div>
-    </div>
+
+        {/* 3. MOBILE TAB BAR (Visible only on small screens) */}
+        <div className="lg:hidden bg-white border-t border-zinc-200 flex justify-around items-center h-24 pb-6 pt-3 shrink-0 z-50 print-hidden safe-area-bottom">
+             <button 
+                onClick={() => setActiveMobileTab('data')}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 pb-2 ${activeMobileTab === 'data' ? 'text-black' : 'text-zinc-400'}`}
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span className="text-[10px] font-medium">Datos</span>
+             </button>
+             
+             <button 
+                onClick={() => setActiveMobileTab('preview')}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 pb-2 ${activeMobileTab === 'preview' ? 'text-black' : 'text-zinc-400'}`}
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span className="text-[10px] font-medium">Vista</span>
+             </button>
+             
+             <button 
+                onClick={() => setActiveMobileTab('config')}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 pb-2 ${activeMobileTab === 'config' ? 'text-black' : 'text-zinc-400'}`}
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span className="text-[10px] font-medium">Diseño</span>
+             </button>
+         </div>
+      </div>
+    </>
   );
 }
