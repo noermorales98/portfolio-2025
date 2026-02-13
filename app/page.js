@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import About from "../components/About";
 import Work from "../components/Work";
+import Videos from "../components/Videos";
+import Testimonials from "../components/Testimonials";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -38,6 +40,8 @@ export default function Home() {
     <About isDarkMode={isDarkMode} />
     <Services isDarkMode={isDarkMode} />
     <Work isDarkMode={isDarkMode} />
+    <Videos isDarkMode={isDarkMode} />
+    <Testimonials isDarkMode={isDarkMode} />
     <QuotationWizard />
     <Contact isDarkMode={isDarkMode} />
     <Footer isDarkMode={isDarkMode} />

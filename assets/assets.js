@@ -109,7 +109,7 @@ export const workData = [
     link: "https://blog.noermorales.com/factusync-web-app/",
   },
   {
-    title: "Creador de Contenido",
+    title: "Social Media",
     description: "Contenido y Redes Sociales",
     bgImage: "/instagramrui.webp",
     link: "https://blog.noermorales.com/rui-machalele-technology-and-content-to-amplify-impact/",
@@ -189,4 +189,62 @@ export const toolsData = [
   assets.nextjs,
   assets.capcut,
   assets.chatgpt,
+];
+
+export const videoData = [
+  {
+    title: "Reel Creativo 1",
+    description: "Edición dinámica",
+    reelId: "DQul_LsDtcr",
+    link: "https://www.instagram.com/reel/DQul_LsDtcr/",
+  },
+  {
+    title: "Reel Creativo 2",
+    description: "Contenido visual",
+    reelId: "DOe4_0KAZMy",
+    link: "https://www.instagram.com/reel/DOe4_0KAZMy/",
+  },
+  {
+    title: "Reel Creativo 3",
+    description: "Storytelling",
+    reelId: "DCPoO-8trDS",
+    link: "https://www.instagram.com/reel/DCPoO-8trDS/",
+  },
+  {
+    title: "Reel Creativo 4",
+    description: "Edición profesional",
+    reelId: "DUl9fmMDi9M",
+    link: "https://www.instagram.com/reel/DUl9fmMDi9M/",
+  },
+];
+
+export const testimonialsData = [
+  {
+    name: "Rui Machalele",
+    role: "Conferencista Internacional",
+    image: "",
+    rating: 5,
+    text: "👏🏿👏🏿👏🏿👏🏿👏🏿👏🏿✌🏿✌🏿✌🏿 Me armó una página web chingona y me ayudó a estructurar mis redes.",
+  },
+  {
+    name: "Kimberly Morfin",
+    role: "Fundadora de Kmorfin Reconstructing Lives",
+    image: "",
+    rating: 5,
+    text: "Muy lindos trabajos, hace mis videos muy bonitos y profesionales."
+  },
+  {
+    name: "Javier Briseño",
+    role: "Consultor empresarial",
+    image: "",
+    rating: 5,
+    text: "Hizo crecer mi Instagram con videos profesionales y atractivos. ¡Gracias!",
+  },
+  {
+    name: "Oswaldo Reyes",
+    role: "Fundador de Lobo Inversionistas",
+    image: "",
+    rating: 5,
+    text: "Armó nuestras páginas para vender nuestros cursos."
+  }
 ];
