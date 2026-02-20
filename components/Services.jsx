@@ -1,7 +1,6 @@
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import React from "react";
-import { motion } from "motion/react";
 import { 
     WebDesign01Icon, 
     Video01Icon, 
@@ -39,51 +38,27 @@ const Services = () => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+    <div
       id="services"
       className="w-full px-[12%] py-10 scroll-mt-20"
     >
-      <motion.h4
-        initial={{ y: -20, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="text-center mb-2 text-lg font-Ovo"
-      >
+      <h4 className="text-center mb-2 text-lg font-Ovo">
         Lo que ofrezco
-      </motion.h4>
+      </h4>
 
-      <motion.h2
-        initial={{ y: -20, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="text-center text-5xl font-Ovo"
-      >
+      <h2 className="text-center text-5xl font-Ovo">
         Mis Servicios
-      </motion.h2>
+      </h2>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.5 }}
-        className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo"
-      >
+      <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
         Diseño webs que enamoran, creo contenido que pega, automatizo tareas con
         IA para que no te compliques y te doy soporte digital para que tu
         presencia online sea la envidia de otros.
-      </motion.p>
+      </p>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.6 }}
-        className="grid grid-cols-auto gap-6 my-10"
-      >
+      <div className="grid grid-cols-auto gap-6 my-10">
         {serviceData.map(({ icon: Icon, title, description, link }, index) => (
-          <motion.div
-            whileHover={{ scale: 1.05 }}
+          <div
             key={index}
             className="border border-gray-400 rounded-lg px-8 py-12 hover:shadow-black hover:bg-lightHover hover:-translate-y-1 duration-500 dark:hover:bg-darkHover dark:hover:shadow-white"
           >
@@ -99,10 +74,10 @@ const Services = () => {
             <a href={link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-black dark:border-white rounded-full text-sm font-medium hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
               Leer más <Image alt="" src={assets.right_arrow} className="w-3 invert dark:invert-0 group-hover:invert-0" />
             </a>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 

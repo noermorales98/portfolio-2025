@@ -1,7 +1,6 @@
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import React from "react";
-import { motion } from "motion/react";
 import { 
     WhatsappIcon, 
     Mail01Icon, 
@@ -12,43 +11,24 @@ import {
 
 const Contact = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+    <div
       id="contact"
       className='w-full px-[12%] py-10 scroll-mt-20 bg-[url("/footer-bg-color.png")] bg-no-repeat bg-center bg-[length:90%_auto] dark:bg-none'
     >
-      <motion.h4
-        initial={{ y: -20, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="text-center mb-2 text-lg font-Ovo"
-      >
+      <h4 className="text-center mb-2 text-lg font-Ovo">
         Conéctate conmigo
-      </motion.h4>
+      </h4>
 
-      <motion.h2
-        initial={{ y: -20, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="text-center text-5xl font-Ovo flex items-center justify-center gap-2 flex-wrap"
-      >
+      <h2 className="text-center text-5xl font-Ovo flex items-center justify-center gap-2 flex-wrap">
         <span>¡Hablemos!</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
-      </motion.h2>
+      </h2>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.5 }}
-        className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo"
-      >
+      <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
         Si tienes alguna duda o quieres cotizar un proyecto, elige la opción que prefieras:
-      </motion.p>
+      </p>
 
       <div className="flex flex-col md:flex-row justify-center gap-6 max-w-2xl mx-auto">
-        <motion.a
-            whileHover={{ scale: 1.05 }}
+        <a
             href="https://wa.me/525642663875"
             target="_blank"
             className="flex-1 border border-gray-300 rounded-xl p-8 hover:bg-green-50 hover:border-green-500 cursor-pointer transition-all dark:border-gray-600 dark:hover:bg-green-900/20 text-center flex flex-col items-center gap-4 group"
@@ -63,10 +43,9 @@ const Contact = () => {
             <span className="text-sm font-semibold flex items-center gap-1 group-hover:underline">
                 Enviar mensaje <ArrowRight02Icon size={14} />
             </span>
-        </motion.a>
+        </a>
 
-        <motion.a
-            whileHover={{ scale: 1.05 }}
+        <a
             href="mailto:noe.rmorales98@gmail.com"
             className="flex-1 border border-gray-300 rounded-xl p-8 hover:bg-blue-50 hover:border-blue-500 cursor-pointer transition-all dark:border-gray-600 dark:hover:bg-blue-900/20 text-center flex flex-col items-center gap-4 group"
         >
@@ -80,7 +59,7 @@ const Contact = () => {
             <span className="text-sm font-semibold flex items-center gap-1 group-hover:underline">
                 Enviar correo <ArrowRight02Icon size={14} />
             </span>
-        </motion.a>
+        </a>
       </div>
 
       <div className="mt-16 text-center">
@@ -97,7 +76,7 @@ const Contact = () => {
           </div>
       </div>
 
-    </motion.div>
+    </div>
   );
 };
 
