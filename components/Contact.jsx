@@ -16,11 +16,11 @@ const Contact = () => {
       className='w-full px-[12%] py-10 scroll-mt-20 bg-[url("/footer-bg-color.png")] bg-no-repeat bg-center bg-[length:90%_auto] dark:bg-none'
     >
       <h4 className="text-center mb-2 text-lg font-Ovo">
-        Conéctate conmigo
+        Contacto
       </h4>
 
       <h2 className="text-center text-5xl font-Ovo flex items-center justify-center gap-2 flex-wrap">
-        <span>¡Hablemos!</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
+        <span>Hablemos de tu proyecto</span> <Image src={assets.saludo_icon} alt="" className="w-8 sm:w-10" />
       </h2>
 
       <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">

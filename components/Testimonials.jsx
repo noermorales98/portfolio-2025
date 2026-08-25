@@ -16,9 +16,7 @@ const Testimonials = ({ isDarkMode }) => {
       </h2>
 
       <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
-        La opinión de quienes han confiado en mi trabajo es lo que más me
-        impulsa a seguir mejorando. Aquí te comparto algunos testimonios
-        reales.
+        Esto dicen algunos de los clientes con los que he trabajado.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-10">

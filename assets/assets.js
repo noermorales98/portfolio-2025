@@ -133,28 +133,28 @@ export const serviceData = [
     icon: assets.iconweb,
     title: "Diseño y Desarrollo Web",
     description:
-      "Sitios web modernos y que se adaptan a todo, con un diseño súper limpio y pensado en ti. Usamos WordPress, React y Next.js para que tu web sea vea bien en todos los dispositivos.",
+      "Landing pages, sitios corporativos y tiendas en línea con WordPress, React o Next.js. Diseño responsivo: tu web se ve bien en teléfono, tablet y computadora.",
     link: "https://blog.noermorales.com/web-design-development/",
   },
   {
     icon: assets.iconmedia,
     title: "Contenido y Redes Sociales",
     description:
-      "Me encargo de tus redes sociales y creo videos, reels y publicaciones que van a hacer que tu marca luzca bien. ¡A conectar con la gente!",
+      "Gestión de perfiles y producción de videos, reels y publicaciones. Me encargo del calendario, la grabación y la edición.",
     link: "https://blog.noermorales.com/content-social-media/",
   },
   {
     icon: assets.iconai,
     title: "Automatización con IA",
     description:
-      "Herramientas inteligentes para que las respuestas en tu web y redes sociales sean automáticas. ¡Así te ahorras tiempo y te enfocas en lo que de verdad importa!",
+      "Configuro chatbots y respuestas automáticas en tu web y tus redes. Las preguntas frecuentes de tus clientes se contestan solas, a cualquier hora.",
     link: "https://blog.noermorales.com/ai-automation/",
   },
   {
     icon: assets.iconsupport,
     title: "Soporte Técnico",
     description:
-      "Ayuda personalizada para que esos problemas técnicos no te quiten el sueño y para que tus herramientas digitales siempre estén a punto. ¡Aquí estoy para lo que necesites!",
+      "Mantenimiento de tu sitio y de tus herramientas digitales, y ayuda cuando algo deja de funcionar. Soporte remoto o presencial.",
     link: "https://blog.noermorales.com/technical-support/",
   },
 ];
@@ -165,21 +165,21 @@ export const infoList = [
     iconDark: assets.code_icon_dark,
     title: "Diseño Web",
     description:
-      "Creo sitios web rápidos, modernos y que se ven bien en cualquier dispositivo.",
+      "Sitios con WordPress, React y Next.js. Responsivos y optimizados para cargar rápido.",
   },
   {
     icon: assets.edu_icon,
     iconDark: assets.edu_icon_dark,
     title: "Creación de Contenido",
     description:
-      "Te ayudo con tus redes: desde armar perfiles hasta crear contenido visual que conecta con tu gente.",
+      "Gestión de perfiles, calendario de publicaciones y producción de videos y reels.",
   },
   {
     icon: assets.project_icon,
     iconDark: assets.project_icon_dark,
     title: "Herramientas de IA",
     description:
-      "Uso IA y automatizaciones para que tu negocio responda y funcione solo, sin fallas.",
+      "Chatbots y automatización de respuestas para tu web y tus redes sociales.",
   },
 ];
 
@@ -193,26 +193,26 @@ export const toolsData = [
 
 export const videoData = [
   {
-    title: "Reel Creativo 1",
-    description: "Edición dinámica",
+    title: "Reel 01",
+    description: "Edición para Instagram",
     reelId: "DQul_LsDtcr",
     link: "https://www.instagram.com/reel/DQul_LsDtcr/",
   },
   {
-    title: "Reel Creativo 2",
-    description: "Contenido visual",
+    title: "Reel 02",
+    description: "Edición para Instagram",
     reelId: "DOe4_0KAZMy",
     link: "https://www.instagram.com/reel/DOe4_0KAZMy/",
   },
   {
-    title: "Reel Creativo 3",
-    description: "Storytelling",
+    title: "Reel 03",
+    description: "Edición para Instagram",
     reelId: "DCPoO-8trDS",
     link: "https://www.instagram.com/reel/DCPoO-8trDS/",
   },
   {
-    title: "Reel Creativo 4",
-    description: "Edición profesional",
+    title: "Reel 04",
+    description: "Edición para Instagram",
     reelId: "DUl9fmMDi9M",
     link: "https://www.instagram.com/reel/DUl9fmMDi9M/",
   },

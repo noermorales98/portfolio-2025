@@ -9,7 +9,7 @@ const Work = ({ isDarkMode }) => {
       className="w-full px-[12%] py-10 scroll-mt-20"
     >
       <h4 className="text-center mb-2 text-lg font-Ovo">
-        ¡Mira lo que hemos logrado!
+        Proyectos recientes
       </h4>
 
       <h2 className="text-center text-5xl font-Ovo">
@@ -17,9 +17,9 @@ const Work = ({ isDarkMode }) => {
       </h2>
 
       <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
-        Échale un ojo a algunas de las webs, contenidos y estrategias digitales
-        que he creado para marcas personales, emprendedores y pequeñas empresas.
-        ¡Resultados que hablan por sí solos!
+        Sitios web, contenido y automatizaciones que he hecho para marcas
+        personales, emprendedores y pequeñas empresas. Cada proyecto tiene su
+        caso de estudio en el blog.
       </p>
 
       <div className="grid grid-cols-auto my-10 gap-5 dark:text-black">

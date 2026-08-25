@@ -14,7 +14,8 @@ const Header = () => {
         <span>Desarrollador Web</span> <Image src={assets.computer_icon} alt='' className='w-10 sm:w-16'/> <span>& Gestor de Contenido</span></h1>
 
         <p className='max-w-2xl mx-auto font-Ovo'>
-        Convierto ideas en experiencias digitales visuales y funcionales.
+        Diseño y desarrollo sitios web, gestiono redes sociales y edito video.
+        También configuro automatizaciones con IA.
         </p>
 
         <div className='flex flex-col sm:flex-row items-center gap-4 mt-4'>

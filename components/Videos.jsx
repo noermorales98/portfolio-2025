@@ -8,7 +8,7 @@ const Videos = ({ isDarkMode }) => {
       className="w-full px-[12%] py-10 scroll-mt-20"
     >
       <h4 className="text-center mb-2 text-lg font-Ovo">
-        Videos que cobran vida
+        Reels y videos editados
       </h4>
 
       <h2 className="text-center text-5xl font-Ovo">
@@ -16,9 +16,8 @@ const Videos = ({ isDarkMode }) => {
       </h2>
 
       <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
-        De la idea al resultado final. Aquí te muestro algunos de los videos
-        que he editado para marcas, creadores de contenido y proyectos
-        personales. ¡Cada video cuenta una historia!
+        Algunos de los videos que he editado para marcas, creadores de contenido
+        y proyectos personales. Puedes verlos directamente en Instagram.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 my-10">

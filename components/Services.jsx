@@ -14,25 +14,25 @@ const Services = () => {
       {
           icon: WebDesign01Icon,
           title: "Diseño y Desarrollo Web",
-          description: "Sitios web modernos y que se adaptan a todo, con un diseño súper limpio y pensado en ti. Usamos WordPress, React y Next.js para que tu web sea vea bien en todos los dispositivos.",
+          description: "Landing pages, sitios corporativos y tiendas en línea con WordPress, React o Next.js. Diseño responsivo: tu web se ve bien en teléfono, tablet y computadora.",
           link: "https://blog.noermorales.com/web-design-development/"
       },
       {
           icon: Video01Icon,
           title: "Contenido y Redes Sociales",
-          description: "Me encargo de tus redes sociales y creo videos, reels y publicaciones que van a hacer que tu marca luzca bien. ¡A conectar con la gente!",
+          description: "Gestión de perfiles y producción de videos, reels y publicaciones. Me encargo del calendario, la grabación y la edición.",
           link: "https://blog.noermorales.com/content-social-media/"
       },
       {
           icon: AiChat02Icon,
           title: "Automatización con IA",
-          description: "Herramientas inteligentes para que las respuestas en tu web y redes sociales sean automáticas. ¡Así te ahorras tiempo y te enfocas en lo que de verdad importa!",
+          description: "Configuro chatbots y respuestas automáticas en tu web y tus redes. Las preguntas frecuentes de tus clientes se contestan solas, a cualquier hora.",
           link: "https://blog.noermorales.com/ai-automation/"
       },
       {
           icon: CustomerService01Icon,
           title: "Soporte Técnico",
-          description: "Ayuda personalizada para que esos problemas técnicos no te quiten el sueño y para que tus herramientas digitales siempre estén a punto. ¡Aquí estoy para lo que necesites!",
+          description: "Mantenimiento de tu sitio y de tus herramientas digitales, y ayuda cuando algo deja de funcionar. Soporte remoto o presencial.",
           link: "https://blog.noermorales.com/technical-support/"
       }
   ];
@@ -43,17 +43,17 @@ const Services = () => {
       className="w-full px-[12%] py-10 scroll-mt-20"
     >
       <h4 className="text-center mb-2 text-lg font-Ovo">
-        Lo que ofrezco
+        Servicios
       </h4>
 
       <h2 className="text-center text-5xl font-Ovo">
-        Mis Servicios
+        Qué puedo hacer por ti
       </h2>
 
       <p className="text-center max-w-2xl mx-auto mt-5 mb-12 font-Ovo">
-        Diseño webs que enamoran, creo contenido que pega, automatizo tareas con
-        IA para que no te compliques y te doy soporte digital para que tu
-        presencia online sea la envidia de otros.
+        Cuatro áreas de trabajo: sitios web, contenido para redes sociales,
+        automatización con IA y soporte técnico. Abajo va el detalle de cada
+        una.
       </p>
 
       <div className="grid grid-cols-auto gap-6 my-10">

@@ -25,12 +25,12 @@ const QuotationWizard = () => {
     });
 
     const categories = [
-        { id: 'monthly', label: 'Planes Mensuales', description: 'Crecimiento continuo para redes y marca.', icon: Rocket01Icon },
+        { id: 'monthly', label: 'Planes Mensuales', description: 'Gestión continua de redes y contenido.', icon: Rocket01Icon },
         { id: 'web', label: 'Desarrollo Web', description: 'Sitios web profesionales (Pago único).', icon: Building03Icon },
         { id: 'design', label: 'Diseño y Multimedia', description: 'Flyers, Edición de Video y Kits.', icon: ShoppingBasket01Icon },
         { id: 'ai', label: 'Integración con IA', description: 'Chatbots y Automatización de respuestas.', icon: AiChat02Icon },
         { id: 'support', label: 'Soporte Técnico', description: 'Mantenimiento y Reparación de equipos.', icon: CustomerService01Icon },
-        { id: 'general_custom', label: 'Personalizada', description: '¿Tienes una idea única? Coticemos tu proyecto.', icon: ShoppingBasket01Icon },
+        { id: 'general_custom', label: 'Personalizada', description: '¿Tu proyecto no encaja en las categorías? Cuéntame qué necesitas.', icon: ShoppingBasket01Icon },
     ];
 
     const packages = {
@@ -58,7 +58,7 @@ const QuotationWizard = () => {
             { id: 'remote', label: 'Soporte Remoto', price: 30, description: 'Limpieza, optimización o instalación de programas (Vía Remota).', icon: CustomerService01Icon },
         ],
         general_custom: [
-            { id: 'custom_project', label: 'Proyecto a Medida', price: 0, description: 'Describe tu idea y crearemos un plan único para ti.', icon: Rocket01Icon },
+            { id: 'custom_project', label: 'Proyecto a Medida', price: 0, description: 'Describe tu proyecto y te propongo un plan y un precio.', icon: Rocket01Icon },
         ]
     };
 
@@ -186,7 +186,7 @@ Me gustaría más información.`;
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                          <h3 className="text-2xl font-Ovo mb-6 text-center">¿Deseas agregar algo más?</h3>
                          <p className="text-center text-gray-500 dark:text-gray-400 mb-8 max-w-lg mx-auto">
-                             Cuéntanos más detalles sobre tu proyecto o necesidades específicas.
+                             Agrega detalles sobre tu proyecto o necesidades específicas.
                          </p>
 
                          <div className="max-w-2xl mx-auto mb-8">
@@ -245,7 +245,7 @@ Me gustaría más información.`;
                             className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-[#25D366] text-white rounded-full font-bold hover:bg-[#20b85c] transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         >
                             <WhatsappIcon size={24} variant="solid" />
-                            Lo quiero, contactar por WhatsApp
+                            Me interesa, contactar por WhatsApp
                         </a>
 
                         <button

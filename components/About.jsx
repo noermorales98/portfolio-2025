@@ -26,11 +26,11 @@ const About = ({ isDarkMode }) => {
         </div>
         <div className="flex-1">
           <p className="mb-10 max-w-2xl font-Ovo">
-            Soy Noe, tu aliado digital. Diseño páginas web que se ven y
-            funcionan bien. Ayudo a emprendedores a crecer en redes sociales con
-            contenido útil y auténtico, y automatizo tareas con inteligencia
-            artificial. ¿Un bot que responde por ti? ¡Lo hacemos! También te
-            cubro en lo técnico, para que todo fluya sin complicaciones.
+            Soy Noe. Desarrollo sitios web con WordPress, React y Next.js,
+            gestiono redes sociales y edito video para marcas y emprendedores.
+            También configuro automatizaciones con IA —por ejemplo, bots que
+            responden mensajes de clientes en tu web o tus redes— y doy soporte
+            técnico cuando algo deja de funcionar.
           </p>
 
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl">
